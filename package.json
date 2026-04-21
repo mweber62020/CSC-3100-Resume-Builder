@@ -1,0 +1,26 @@
+{
+  "name": "csc-3100-resume-builder",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/mweber62020/CSC-3100-Resume-Builder#readme",
+  "bugs": {
+    "url": "https://github.com/mweber62020/CSC-3100-Resume-Builder/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mweber62020/CSC-3100-Resume-Builder.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.9.0",
+    "bootstrap": "^5.3.8",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1"
+  }
+}
