@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ResuMint</title>
+
+    <!-- Pulse is a Bootswatch theme that replaces Bootstrap's default CSS -->
+    <!-- Do NOT also load bootstrap.min.css - Pulse already includes it -->
+    <link rel="stylesheet" href="css/pulse.min.css" />
+
+</head>
+<body>
+
+    <!-- ============================================================
+         NAVBAR
+         Top navigation bar with links to each section of the SPA.
+         Clicking a link calls showSection() in app.js which hides
+         all sections and shows the one requested.
+         The brand/logo always takes the user back to the home page.
+    ============================================================ -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary" aria-label="Main navigation">
+        <div class="container-fluid">
+
+            <!-- Brand / logo - clicking always returns to home -->
+            <a class="navbar-brand fw-bold" href="#" aria-label="ResuMint home"
+                onclick="showSection('divHome')">ResuMint</a>
+
+            <!-- Hamburger button shown on mobile when navbar is collapsed -->
+            <button class="navbar-toggler" type="button"
+                data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Nav links - each one shows a different section -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto" role="menubar">
+                    <li class="nav-item" role="none">
+                        <a class="nav-link" href="#" role="menuitem"
+                            aria-label="Go to Profile section"
+                            onclick="showSection('divProfile'); loadProfile();">Profile</a>
+                    </li>
+                    <li class="nav-item" role="none">
+                        <a class="nav-link" href="#" role="menuitem"
+                            aria-label="Go to Jobs section"
+                            onclick="showSection('divJobs'); loadJobs();">Jobs</a>
+                    </li>
+                    <li class="nav-item" role="none">
+                        <a class="nav-link" href="#" role="menuitem"
+                            aria-label="Go to Skills section"
+                            onclick="showSection('divSkills'); loadSkills();">Skills</a>
+                    </li>
+                    <li class="nav-item" role="none">
+                        <a class="nav-link" href="#" role="menuitem"
+                            aria-label="Go to Certifications section"
+                            onclick="showSection('divCertifications'); loadCerts();">Certifications</a>
+                    </li>
+                    <li class="nav-item" role="none">
+                        <a class="nav-link" href="#" role="menuitem"
+                            aria-label="Go to Awards section"
+                            onclick="showSection('divAwards'); loadAwards();">Awards</a>
+                    </li>
+                    <li class="nav-item" role="none">
+                        <a class="nav-link" href="#" role="menuitem"
+                            aria-label="Go to Resume Builder section"
+                            onclick="showSection('divResume'); loadResumeBuilder();">Build Resume</a>
+                    </li>
+                </ul>
+
+                <!-- Settings link pinned to the right side of the navbar -->
+                <ul class="navbar-nav ms-auto" role="menubar">
+                    <li class="nav-item" role="none">
+                        <a class="nav-link" href="#" role="menuitem"
+                            aria-label="Go to Settings"
+                            onclick="showSection('divSettings'); loadSettings();">Settings</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ============================================================
+         MAIN CONTENT
+         All sections live here. Only one is visible at a time.
+         d-none is a Bootstrap class that sets display:none.
+         app.js handles showing/hiding via showSection().
+    ============================================================ -->
+    <main class="container mt-4" aria-label="Main content">
+
+        <!-- --------------------------------------------------------
+             HOME SECTION
+             Landing page shown when the app first loads or when the
+             user clicks the ResuMint logo. Describes the app and
+             lists its main features.
+        -------------------------------------------------------- -->
+        <section id="divHome" aria-labelledby="hHome">
+            <div class="text-center mb-5">
+                <h1 id="hHome" class="display-4 fw-bold">ResuMint</h1>
+                <p class="lead text-muted">Build a tailored resume for every job — powered by AI suggestions.</p>
+                <button type="button" class="btn btn-primary btn-lg mt-2"
+                    aria-label="Get started building your resume"
+                    onclick="showSection('divProfile')">Get Started</button>
+            </div>
+
+            <!-- Feature cards - one per major feature of the app -->
+            <div class="row g-4" aria-label="Feature list">
+
+                <div class="col-md-4">
+                    <div class="card h-100" aria-label="Profile feature">
+                        <div class="card-body">
+                            <h5 class="card-title">Profile</h5>
+                            <p class="card-text text-muted">
+                                Enter your personal info, contact details, and a professional
+                                summary to anchor every resume you build.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card h-100" aria-label="Jobs and responsibilities feature">
+                        <div class="card-body">
+                            <h5 class="card-title">Jobs &amp; Responsibilities</h5>
+                            <p class="card-text text-muted">
+                                Store your work history and the specific responsibilities for
+                                each role. Pick and choose what to include per resume.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card h-100" aria-label="Skills certifications and awards feature">
+                        <div class="card-body">
+                            <h5 class="card-title">Skills, Certs &amp; Awards</h5>
+                            <p class="card-text text-muted">
+                                Keep a running list of your skills, certifications, and awards.
+                                Select the most relevant ones when generating a resume.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card h-100" aria-label="AI suggestions feature">
+                        <div class="card-body">
+                            <h5 class="card-title">AI Suggestions</h5>
+                            <p class="card-text text-muted">
+                                Powered by Google Gemini. Get instant feedback and suggestions
+                                to improve how you describe your experience.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card h-100" aria-label="Resume builder feature">
+                        <div class="card-body">
+                            <h5 class="card-title">Resume Builder</h5>
+                            <p class="card-text text-muted">
+                                Select what to include and preview a clean, print-ready resume
+                                tailored specifically to the job you are applying for.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card h-100" aria-label="Local and private feature">
+                        <div class="card-body">
+                            <h5 class="card-title">Local &amp; Private</h5>
+                            <p class="card-text text-muted">
+                                Everything is stored in a local database on your computer.
+                                Your data never leaves your machine.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- --------------------------------------------------------
+             PROFILE SECTION
+             User enters their personal info: name, contact, summary.
+             This info appears at the top of every generated resume.
+        -------------------------------------------------------- -->
+        <section id="divProfile" class="d-none" aria-labelledby="hProfile">
+            <h2 id="hProfile">Profile</h2>
+            <p class="text-muted">Enter your personal and contact information.</p>
+
+            <form id="frmProfile" novalidate aria-label="Profile form">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="txtFirstName" class="form-label">First Name</label>
+                        <input type="text" class="form-control" id="txtFirstName"
+                            aria-label="First name" placeholder="John" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="txtLastName" class="form-label">Last Name</label>
+                        <input type="text" class="form-control" id="txtLastName"
+                            aria-label="Last name" placeholder="Doe" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="txtEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="txtEmail"
+                            aria-label="Email address" placeholder="john@example.com" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="txtPhone" class="form-label">Phone</label>
+                        <input type="tel" class="form-control" id="txtPhone"
+                            aria-label="Phone number" placeholder="(555) 555-5555" />
+                    </div>
+                    <div class="col-md-12">
+                        <label for="txtLocation" class="form-label">Location</label>
+                        <input type="text" class="form-control" id="txtLocation"
+                            aria-label="City and state" placeholder="Nashville, TN" />
+                    </div>
+                    <div class="col-md-12">
+                        <label for="txtSummary" class="form-label">Professional Summary</label>
+                        <textarea class="form-control" id="txtSummary" rows="4"
+                            aria-label="Professional summary"
+                            placeholder="A brief summary of your professional background..."></textarea>
+                    </div>
+                </div>
+
+                <!-- AI suggestion area - shown and filled in by gemini.js -->
+                <div id="divProfileSuggestion" class="alert alert-info mt-3 d-none"
+                    role="alert" aria-live="polite" aria-label="AI suggestion"></div>
+
+                <div class="mt-3">
+                    <button type="button" class="btn btn-primary" id="btnSaveProfile"
+                        aria-label="Save profile information">Save Profile</button>
+                    <button type="button" class="btn btn-outline-secondary ms-2" id="btnSuggestProfile"
+                        aria-label="Get AI suggestions for your summary">Get AI Suggestions</button>
+                </div>
+            </form>
+
+            <!-- Next button - takes the user to the Jobs section -->
+            <div class="d-flex justify-content-end mt-4">
+                <button type="button" class="btn btn-outline-primary"
+                    aria-label="Go to Jobs section"
+                    onclick="showSection('divJobs'); loadJobs();">
+                    Next: Jobs &rarr;
+                </button>
+            </div>
+        </section>
+
+        <!-- --------------------------------------------------------
+             JOBS SECTION
+             User adds jobs they have held. Each job can have multiple
+             responsibilities. When building the resume the user picks
+             which jobs and responsibilities to include.
+        -------------------------------------------------------- -->
+        <section id="divJobs" class="d-none" aria-labelledby="hJobs">
+            <h2 id="hJobs">Jobs</h2>
+            <p class="text-muted">Add your work experience and responsibilities.</p>
+
+            <!-- Form to add a new job -->
+            <div class="card mb-4" aria-label="Add new job form">
+                <div class="card-header">Add a Job</div>
+                <div class="card-body">
+                    <form id="frmAddJob" novalidate aria-label="Add job form">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="txtJobCompany" class="form-label">Company</label>
+                                <input type="text" class="form-control" id="txtJobCompany"
+                                    aria-label="Company name" placeholder="Acme Corp" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label for="txtJobTitle" class="form-label">Job Title</label>
+                                <input type="text" class="form-control" id="txtJobTitle"
+                                    aria-label="Job title" placeholder="Software Developer" required />
+                            </div>
+                            <div class="col-md-4">
+                                <label for="txtJobStart" class="form-label">Start Date</label>
+                                <input type="text" class="form-control" id="txtJobStart"
+                                    aria-label="Start date" placeholder="Jan 2022" />
+                            </div>
+                            <div class="col-md-4">
+                                <label for="txtJobEnd" class="form-label">End Date</label>
+                                <input type="text" class="form-control" id="txtJobEnd"
+                                    aria-label="End date" placeholder="Present" />
+                            </div>
+                            <div class="col-md-4">
+                                <label for="txtJobLocation" class="form-label">Location</label>
+                                <input type="text" class="form-control" id="txtJobLocation"
+                                    aria-label="Job location" placeholder="Nashville, TN" />
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-primary mt-3" id="btnAddJob"
+                            aria-label="Add job">Add Job</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- List of saved jobs rendered by jobs.js -->
+            <div id="divJobList" aria-label="Saved jobs list" aria-live="polite"></div>
+
+            <!-- Next button - takes the user to the Skills section -->
+            <div class="d-flex justify-content-end mt-4">
+                <button type="button" class="btn btn-outline-primary"
+                    aria-label="Go to Skills section"
+                    onclick="showSection('divSkills'); loadSkills();">
+                    Next: Skills &rarr;
+                </button>
+            </div>
+        </section>
+
+        <!-- --------------------------------------------------------
+             SKILLS SECTION
+             User adds skills optionally grouped by category
+             (e.g. "Programming Languages", "Tools", etc.)
+        -------------------------------------------------------- -->
+        <section id="divSkills" class="d-none" aria-labelledby="hSkills">
+            <h2 id="hSkills">Skills</h2>
+            <p class="text-muted">Add your skills and group them by category.</p>
+
+            <div class="card mb-4" aria-label="Add new skill form">
+                <div class="card-header">Add a Skill</div>
+                <div class="card-body">
+                    <form id="frmAddSkill" novalidate aria-label="Add skill form">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="txtSkillName" class="form-label">Skill</label>
+                                <input type="text" class="form-control" id="txtSkillName"
+                                    aria-label="Skill name" placeholder="JavaScript" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label for="txtSkillCategory" class="form-label">
+                                    Category <span class="text-muted">(optional)</span>
+                                </label>
+                                <input type="text" class="form-control" id="txtSkillCategory"
+                                    aria-label="Skill category" placeholder="Programming Languages" />
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-primary mt-3" id="btnAddSkill"
+                            aria-label="Add skill">Add Skill</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- List of saved skills rendered by skills.js -->
+            <div id="divSkillList" aria-label="Saved skills list" aria-live="polite"></div>
+
+            <!-- Next button - takes the user to the Certifications section -->
+            <div class="d-flex justify-content-end mt-4">
+                <button type="button" class="btn btn-outline-primary"
+                    aria-label="Go to Certifications section"
+                    onclick="showSection('divCertifications'); loadCerts();">
+                    Next: Certifications &rarr;
+                </button>
+            </div>
+        </section>
+
+        <!-- --------------------------------------------------------
+             CERTIFICATIONS SECTION
+             User adds certifications they have earned.
+        -------------------------------------------------------- -->
+        <section id="divCertifications" class="d-none" aria-labelledby="hCertifications">
+            <h2 id="hCertifications">Certifications</h2>
+            <p class="text-muted">Add certifications you have earned.</p>
+
+            <div class="card mb-4" aria-label="Add new certification form">
+                <div class="card-header">Add a Certification</div>
+                <div class="card-body">
+                    <form id="frmAddCert" novalidate aria-label="Add certification form">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="txtCertName" class="form-label">Certification Name</label>
+                                <input type="text" class="form-control" id="txtCertName"
+                                    aria-label="Certification name" placeholder="AWS Certified Developer" required />
+                            </div>
+                            <div class="col-md-4">
+                                <label for="txtCertIssuer" class="form-label">Issuing Organization</label>
+                                <input type="text" class="form-control" id="txtCertIssuer"
+                                    aria-label="Issuing organization" placeholder="Amazon Web Services" />
+                            </div>
+                            <div class="col-md-2">
+                                <label for="txtCertDate" class="form-label">Date</label>
+                                <input type="text" class="form-control" id="txtCertDate"
+                                    aria-label="Date earned" placeholder="2023" />
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-primary mt-3" id="btnAddCert"
+                            aria-label="Add certification">Add Certification</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- List of saved certifications rendered by skills.js -->
+            <div id="divCertList" aria-label="Saved certifications list" aria-live="polite"></div>
+
+            <!-- Next button - takes the user to the Awards section -->
+            <div class="d-flex justify-content-end mt-4">
+                <button type="button" class="btn btn-outline-primary"
+                    aria-label="Go to Awards section"
+                    onclick="showSection('divAwards'); loadAwards();">
+                    Next: Awards &rarr;
+                </button>
+            </div>
+        </section>
+
+        <!-- --------------------------------------------------------
+             AWARDS SECTION
+             User adds awards and achievements.
+        -------------------------------------------------------- -->
+        <section id="divAwards" class="d-none" aria-labelledby="hAwards">
+            <h2 id="hAwards">Awards</h2>
+            <p class="text-muted">Add awards and achievements.</p>
+
+            <div class="card mb-4" aria-label="Add new award form">
+                <div class="card-header">Add an Award</div>
+                <div class="card-body">
+                    <form id="frmAddAward" novalidate aria-label="Add award form">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="txtAwardName" class="form-label">Award Name</label>
+                                <input type="text" class="form-control" id="txtAwardName"
+                                    aria-label="Award name" placeholder="Employee of the Year" required />
+                            </div>
+                            <div class="col-md-4">
+                                <label for="txtAwardIssuer" class="form-label">Issuing Organization</label>
+                                <input type="text" class="form-control" id="txtAwardIssuer"
+                                    aria-label="Issuing organization" placeholder="Acme Corp" />
+                            </div>
+                            <div class="col-md-2">
+                                <label for="txtAwardDate" class="form-label">Date</label>
+                                <input type="text" class="form-control" id="txtAwardDate"
+                                    aria-label="Date received" placeholder="2024" />
+                            </div>
+                            <div class="col-md-12">
+                                <label for="txtAwardDescription" class="form-label">
+                                    Description <span class="text-muted">(optional)</span>
+                                </label>
+                                <textarea class="form-control" id="txtAwardDescription" rows="2"
+                                    aria-label="Award description"
+                                    placeholder="Brief description of the award..."></textarea>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-primary mt-3" id="btnAddAward"
+                            aria-label="Add award">Add Award</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- List of saved awards rendered by awards.js -->
+            <div id="divAwardList" aria-label="Saved awards list" aria-live="polite"></div>
+
+            <!-- Next button - takes the user to the Build Resume section -->
+            <div class="d-flex justify-content-end mt-4">
+                <button type="button" class="btn btn-primary"
+                    aria-label="Go to Build Resume section"
+                    onclick="showSection('divResume'); loadResumeBuilder();">
+                    Next: Build Resume &rarr;
+                </button>
+            </div>
+        </section>
+
+        <!-- --------------------------------------------------------
+             BUILD RESUME SECTION
+             User selects which jobs, skills, certs, and awards to
+             include, then previews and prints their resume.
+        -------------------------------------------------------- -->
+        <section id="divResume" class="d-none" aria-labelledby="hResume">
+            <h2 id="hResume">Build Resume</h2>
+            <p class="text-muted">Select what to include and preview your resume.</p>
+
+            <!-- Selection UI - rendered by resume.js when this section loads -->
+            <div id="divResumeSelections" aria-label="Resume content selections" aria-live="polite"></div>
+
+            <!-- Generate and Print buttons -->
+            <div class="d-flex gap-2 mt-4">
+                <button type="button" class="btn btn-primary" id="btnGenerateResume"
+                    aria-label="Generate resume preview">Generate Preview</button>
+                <button type="button" class="btn btn-outline-secondary" id="btnPrintResume"
+                    aria-label="Print resume">Print / Save as PDF</button>
+            </div>
+
+            <!-- Resume preview - this is what gets printed -->
+            <!-- The print CSS in the <style> block below hides everything
+                 except this div when the user prints -->
+            <div id="divResumePreview" class="mt-4" aria-label="Resume preview" aria-live="polite"></div>
+        </section>
+
+        <!-- --------------------------------------------------------
+             SETTINGS SECTION
+             User saves their Gemini API key and resume preferences.
+             All settings are stored in tblSettings in the database.
+        -------------------------------------------------------- -->
+        <section id="divSettings" class="d-none" aria-labelledby="hSettings">
+            <h2 id="hSettings">Settings</h2>
+            <p class="text-muted">Configure your ResuMint preferences.</p>
+
+            <!-- Gemini API Key -->
+            <div class="card mb-4" aria-label="Gemini API key setting">
+                <div class="card-header">Gemini API Key</div>
+                <div class="card-body">
+                    <p class="card-text text-muted">
+                        Your key is stored locally and never shared.
+                        Get a free key at <a href="https://aistudio.google.com" target="_blank" rel="noopener noreferrer" aria-label="Get a free Gemini API key at Google AI Studio (opens in new tab)">aistudio.google.com</a>.
+                    </p>
+                    <div class="mb-3">
+                        <label for="txtApiKey" class="form-label">API Key</label>
+                        <input type="password" class="form-control" id="txtApiKey"
+                            aria-label="Gemini API key" placeholder="Paste your Gemini API key here" />
+                    </div>
+                    <button type="button" class="btn btn-primary" id="btnSaveApiKey"
+                        aria-label="Save API key">Save Key</button>
+                </div>
+            </div>
+
+            <!-- Resume Font -->
+            <div class="card mb-4" aria-label="Resume font setting">
+                <div class="card-header">Resume Font</div>
+                <div class="card-body">
+                    <p class="card-text text-muted">
+                        Choose the font used when previewing and printing your resume.
+                    </p>
+                    <div class="mb-3">
+                        <label for="cboFont" class="form-label">Font</label>
+                        <select class="form-select" id="cboFont" aria-label="Resume font">
+                            <option value="Arial">Arial</option>
+                            <option value="Georgia">Georgia</option>
+                            <option value="Times New Roman">Times New Roman</option>
+                            <option value="Calibri">Calibri</option>
+                        </select>
+                    </div>
+                    <button type="button" class="btn btn-primary" id="btnSaveFont"
+                        aria-label="Save font preference">Save Font</button>
+                </div>
+            </div>
+
+            <!-- Dark Mode -->
+            <div class="card mb-4" aria-label="Dark mode setting">
+                <div class="card-header">Appearance</div>
+                <div class="card-body">
+                    <p class="card-text text-muted">
+                        Switch between light and dark mode for the app interface.
+                    </p>
+                    <!-- Bootstrap 5.3 form-check toggle switch -->
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch"
+                            id="chkDarkMode" aria-label="Toggle dark mode" />
+                        <label class="form-check-label" for="chkDarkMode">Dark Mode</label>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- ============================================================
+         LIBRARIES
+         Loaded at the bottom so the HTML renders before scripts run.
+         Bootstrap bundle includes Popper.js for dropdowns/modals.
+    ============================================================ -->
+    <script src="js/lib/bootstrap.bundle.min.js"></script>
+    <script src="js/lib/sweetalert2@11.min.js"></script>
+
+    <!-- ============================================================
+         APP SCRIPTS
+         app.js must be loaded last since it depends on the DOM
+         and Bootstrap being fully loaded above.
+    ============================================================ -->
+    <script src="js/app.js"></script>
+    <script src="js/jobs.js"></script>
+    <script src="js/skills.js"></script>
+    <script src="js/certs.js"></script>
+    <script src="js/awards.js"></script>
+    <script src="js/profile.js"></script>
+    <script src="js/settings.js"></script>
+    <script src="js/gemini.js"></script>
+    <script src="js/resume.js"></script>
+</body>
+</html>
