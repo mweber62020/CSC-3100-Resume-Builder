@@ -1,15 +1,12 @@
 // ============================================================
 // settings.js - Frontend logic for the Settings section
-//
 // Loads saved settings and wires up each save button.
 // All settings are stored in a single row in tblSettings.
-// Each save button sends a PUT with the full settings object.
 // ============================================================
 
 const strSettingsApiUrl = '/api/settings';
 
-// Holds the current settings so each individual save button
-// can send the full row without overwriting unrelated fields
+// Holds the current settings so each individual save button can send the full row without overwriting unrelated fields
 let objCurrentSettings = {
     strGeminiApiKey: null,
     strResumeFont: 'Arial'
@@ -18,17 +15,16 @@ let objCurrentSettings = {
 // ------------------------------------------------------------
 // loadSettings()
 // Fetches the settings row and populates the form fields.
-// Called when the Settings nav link is clicked.
 // ------------------------------------------------------------
 async function loadSettings() {
     try {
         const objResponse = await fetch(strSettingsApiUrl);
         const objSettings = await objResponse.json();
 
-        // Store the current values so saves can send the full row
+        // Store the current values
         objCurrentSettings = objSettings;
 
-        // Mask the API key - just update the placeholder if one is saved
+        // Placeholder if a key is saved
         if (objSettings.strGeminiApiKey) {
             document.querySelector('#txtApiKey').placeholder = 'API key is saved — paste a new one to replace it';
         }
@@ -38,7 +34,7 @@ async function loadSettings() {
             document.querySelector('#cboFont').value = objSettings.strResumeFont;
         }
 
-        // Dark mode is handled by app.js via localStorage
+        // Dark mode is handled by app.js
         const strTheme = localStorage.getItem('theme') || 'light';
         document.querySelector('#chkDarkMode').checked = (strTheme === 'dark');
 
@@ -49,15 +45,14 @@ async function loadSettings() {
 
 // ------------------------------------------------------------
 // saveSettings(objUpdated)
-// Sends a PUT with the full settings row. Merges the updated
-// field(s) into the current settings so nothing gets wiped.
-// @param {object} objUpdated - the field(s) being changed
+// Sends a PUT with the full settings row. Merges the updated field(s) into the current settings.
 // ------------------------------------------------------------
 async function saveSettings(objUpdated) {
     // Merge the change into the current settings before sending
     const objToSave = { ...objCurrentSettings, ...objUpdated };
 
     try {
+        // Send the updated settings to the API
         const objResponse = await fetch(strSettingsApiUrl, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
@@ -116,9 +111,7 @@ async function saveFont() {
     }
 }
 
-// ------------------------------------------------------------
-// Wire up buttons once the DOM is ready
-// ------------------------------------------------------------
+// Onload, set up event listeners
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('#btnSaveApiKey').addEventListener('click', saveApiKey);
     document.querySelector('#btnSaveFont').addEventListener('click', saveFont);

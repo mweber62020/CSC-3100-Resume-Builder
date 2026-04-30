@@ -3,12 +3,12 @@
 // Handles adding, displaying, and deleting awards.
 // ============================================================
 
+// API endpoint for awards
 const strAwardsApiUrl = '/api/awards';
 
 // ------------------------------------------------------------
 // loadAwards()
 // Fetches all awards from the API and renders them.
-// Called when the Awards nav link or Next button is clicked.
 // ------------------------------------------------------------
 async function loadAwards() {
     try {
@@ -22,8 +22,8 @@ async function loadAwards() {
 
 // ------------------------------------------------------------
 // renderAwards(arrAwards)
-// Builds the awards list in the DOM.
-// @param {Array} arrAwards - array of award objects from the API
+// Builds the awards list.
+// Accepts an array of award objects from the API
 // ------------------------------------------------------------
 function renderAwards(arrAwards) {
     const divAwardList = document.querySelector('#divAwardList');
@@ -32,7 +32,7 @@ function renderAwards(arrAwards) {
         divAwardList.innerHTML = '<p class="text-muted">No awards added yet.</p>';
         return;
     }
-
+    // Build the HTML for each award using cards
     divAwardList.innerHTML = arrAwards.map((objAward) => `
         <div class="card mb-2" aria-label="Award: ${objAward.strName}">
             <div class="card-body d-flex justify-content-between align-items-start">
@@ -40,7 +40,7 @@ function renderAwards(arrAwards) {
                     <strong>${objAward.strName}</strong>
                     <span class="text-muted ms-2 small">
                         ${objAward.strIssuer ? objAward.strIssuer : ''}
-                        ${objAward.strDate ? '&bull; ' + objAward.strDate : ''}
+                        ${objAward.strDate ? '&bull; ' + objAward.strDate : ''} <!-- bullet point -->
                     </span>
                     ${objAward.strDescription
                         ? `<p class="text-muted small mb-0 mt-1">${objAward.strDescription}</p>`
@@ -61,9 +61,9 @@ function renderAwards(arrAwards) {
 // Reads the form, validates, and POSTs a new award.
 // ------------------------------------------------------------
 async function addAward() {
-    const strName        = document.querySelector('#txtAwardName').value.trim();
-    const strIssuer      = document.querySelector('#txtAwardIssuer').value.trim();
-    const strDate        = document.querySelector('#txtAwardDate').value.trim();
+    const strName = document.querySelector('#txtAwardName').value.trim();
+    const strIssuer = document.querySelector('#txtAwardIssuer').value.trim();
+    const strDate = document.querySelector('#txtAwardDate').value.trim();
     const strDescription = document.querySelector('#txtAwardDescription').value.trim();
 
     if (strName === '') {
@@ -72,6 +72,7 @@ async function addAward() {
     }
 
     try {
+        // Send the new award to the API
         const objResponse = await fetch(strAwardsApiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -84,7 +85,7 @@ async function addAward() {
             Swal.fire({ title: 'Error', text: objData.strError, icon: 'error' });
             return;
         }
-
+        // Clear the form and reload the awards list
         document.querySelector('#frmAddAward').reset();
         loadAwards();
     } catch (objError) {
@@ -94,8 +95,7 @@ async function addAward() {
 
 // ------------------------------------------------------------
 // deleteAward(intAwardID)
-// DELETEs an award and reloads the list.
-// @param {number} intAwardID - the award to delete
+// Deletes an award and reloads the list.
 // ------------------------------------------------------------
 async function deleteAward(intAwardID) {
     try {
@@ -116,7 +116,7 @@ async function deleteAward(intAwardID) {
     }
 }
 
-// Wire up the Add Award button once the DOM is ready
+// Onload, set up event listeners
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('#btnAddAward').addEventListener('click', addAward);
 });

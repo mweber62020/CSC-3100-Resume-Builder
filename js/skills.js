@@ -3,12 +3,12 @@
 // Handles adding, displaying, and deleting skills.
 // ============================================================
 
+// API endpoint for skills
 const strSkillsApiUrl = '/api/skills';
 
 // ------------------------------------------------------------
 // loadSkills()
 // Fetches all skills from the API and renders them.
-// Called when the Skills nav link or Next button is clicked.
 // ------------------------------------------------------------
 async function loadSkills() {
     try {
@@ -24,7 +24,6 @@ async function loadSkills() {
 // renderSkills(arrSkills)
 // Builds the skills list in the DOM.
 // Skills are grouped by category if one is provided.
-// @param {Array} arrSkills - array of skill objects from the API
 // ------------------------------------------------------------
 function renderSkills(arrSkills) {
     const divSkillList = document.querySelector('#divSkillList');
@@ -35,7 +34,6 @@ function renderSkills(arrSkills) {
     }
 
     // Group skills by category so they display together.
-    // Skills with no category are grouped under 'Other'.
     const objGrouped = {};
     arrSkills.forEach((objSkill) => {
         const strCategory = objSkill.strCategory || 'Other';
@@ -80,6 +78,7 @@ async function addSkill() {
     }
 
     try {
+        // Send the new skill to the API
         const objResponse = await fetch(strSkillsApiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -103,7 +102,6 @@ async function addSkill() {
 // ------------------------------------------------------------
 // deleteSkill(intSkillID)
 // DELETEs a skill and reloads the list.
-// @param {number} intSkillID - the skill to delete
 // ------------------------------------------------------------
 async function deleteSkill(intSkillID) {
     try {
@@ -124,7 +122,7 @@ async function deleteSkill(intSkillID) {
     }
 }
 
-// Wire up the Add Skill button once the DOM is ready
+// Onload, set up event listeners
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('#btnAddSkill').addEventListener('click', addSkill);
 });

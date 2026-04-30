@@ -3,12 +3,12 @@
 // Handles adding, displaying, and deleting certifications.
 // ============================================================
 
+// API endpoint for certifications
 const strCertsApiUrl = '/api/certs';
 
 // ------------------------------------------------------------
 // loadCerts()
 // Fetches all certifications from the API and renders them.
-// Called when the Certifications nav link or Next button is clicked.
 // ------------------------------------------------------------
 async function loadCerts() {
     try {
@@ -23,7 +23,7 @@ async function loadCerts() {
 // ------------------------------------------------------------
 // renderCerts(arrCerts)
 // Builds the certifications list in the DOM.
-// @param {Array} arrCerts - array of cert objects from the API
+// Accepts an array of cert objects from the API.
 // ------------------------------------------------------------
 function renderCerts(arrCerts) {
     const divCertList = document.querySelector('#divCertList');
@@ -67,6 +67,7 @@ async function addCert() {
     }
 
     try {
+        // Send the new certification to the API
         const objResponse = await fetch(strCertsApiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -79,7 +80,7 @@ async function addCert() {
             Swal.fire({ title: 'Error', text: objData.strError, icon: 'error' });
             return;
         }
-
+        // Clear the form and reload the certifications list
         document.querySelector('#frmAddCert').reset();
         loadCerts();
     } catch (objError) {
@@ -90,7 +91,6 @@ async function addCert() {
 // ------------------------------------------------------------
 // deleteCert(intCertID)
 // DELETEs a certification and reloads the list.
-// @param {number} intCertID - the certification to delete
 // ------------------------------------------------------------
 async function deleteCert(intCertID) {
     try {
@@ -111,7 +111,7 @@ async function deleteCert(intCertID) {
     }
 }
 
-// Wire up the Add Certification button once the DOM is ready
+// Onload, set up event listeners
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('#btnAddCert').addEventListener('click', addCert);
 });

@@ -1,28 +1,15 @@
 // ============================================================
 // jobs.js - Frontend logic for the Jobs section
-//
-// Handles adding, displaying, and deleting jobs and their
-// responsibilities. Communicates with the backend via fetch().
-//
-// Functions:
-//   loadJobs()                        - fetches and renders all jobs
-//   renderJobs(arrJobs)               - builds the job cards in the DOM
-//   loadResponsibilities(intJobID)    - fetches and renders responsibilities for one job
-//   addJob()                          - reads the form and POSTs a new job
-//   deleteJob(intJobID)               - DELETEs a job and refreshes the list
-//   addResponsibility(intJobID)       - POSTs a new responsibility for a job
-//   deleteResponsibility(intRespID, intJobID) - DELETEs a responsibility
+// Handles adding, displaying, and deleting jobs and their responsibilities.
 // ============================================================
 
-// Base URL for all API calls in this file
+// API endpoints for jobs and responsibilities
 const strJobsApiUrl = '/api/jobs';
 const strRespApiUrl = '/api/responsibilities';
 
 // ------------------------------------------------------------
 // loadJobs()
 // Fetches all jobs from the API and renders them on the page.
-// Called once when the Jobs section is first shown, and again
-// after any add or delete to keep the list up to date.
 // ------------------------------------------------------------
 async function loadJobs() {
     try {
@@ -38,7 +25,7 @@ async function loadJobs() {
 // renderJobs(arrJobs)
 // Builds and injects HTML job cards into divJobList.
 // Each card shows the job details and a responsibilities section.
-// @param {Array} arrJobs - array of job objects from the API
+// Accepts an array of job objects from the API.
 // ------------------------------------------------------------
 function renderJobs(arrJobs) {
     const divJobList = document.querySelector('#divJobList');
@@ -50,7 +37,6 @@ function renderJobs(arrJobs) {
     }
 
     // Build a card for each job
-    // Template literals let us write HTML as a string cleanly
     divJobList.innerHTML = arrJobs.map((objJob) => `
         <div class="card mb-3" id="divJob_${objJob.intJobID}" aria-label="Job: ${objJob.strTitle} at ${objJob.strCompany}">
             <div class="card-header d-flex justify-content-between align-items-center">
@@ -86,7 +72,7 @@ function renderJobs(arrJobs) {
         </div>
     `).join('');
 
-    // After rendering all job cards, load responsibilities for each one
+    // After rendering all job cards, load responsibilities
     arrJobs.forEach((objJob) => {
         loadResponsibilities(objJob.intJobID);
     });
@@ -94,13 +80,11 @@ function renderJobs(arrJobs) {
 
 // ------------------------------------------------------------
 // loadResponsibilities(intJobID)
-// Fetches responsibilities for one job and renders them inside
-// that job's card. Called after each job card is rendered.
-// @param {number} intJobID - the ID of the job to load for
-// ------------------------------------------------------------
+// Fetches responsibilities for one job and renders them inside that jobs card
+// -------------------------------------------
 async function loadResponsibilities(intJobID) {
     try {
-        // Pass intJobID as a query string per API conventions
+        // Pass intJobID as a query string
         const objResponse = await fetch(`${strRespApiUrl}?intJobID=${intJobID}`);
         const arrResps = await objResponse.json();
 
@@ -111,9 +95,7 @@ async function loadResponsibilities(intJobID) {
             return;
         }
 
-        // Render each responsibility as a simple row with a border bottom.
-        // Avoiding list-group here because the Pulse theme applies a dark
-        // background to list-group-item that clashes with the card body.
+        // Render each responsibility as a simple row.
         divRespList.innerHTML = arrResps.map((objResp) => `
             <div class="d-flex justify-content-between align-items-center border-bottom py-1"
                 aria-label="Responsibility: ${objResp.strDescription}">
@@ -132,19 +114,15 @@ async function loadResponsibilities(intJobID) {
 
 // ------------------------------------------------------------
 // addJob()
-// Reads values from the Add Job form, validates them, and
-// POSTs a new job to the API. Reloads the list on success.
-// Called by the Add Job button in index.html.
+// Reads values from the Add Job form, validates them, and POSTs a new job to the API.
 // ------------------------------------------------------------
 async function addJob() {
-    // Read and trim all form values
     const strCompany  = document.querySelector('#txtJobCompany').value.trim();
     const strTitle    = document.querySelector('#txtJobTitle').value.trim();
     const strStart    = document.querySelector('#txtJobStart').value.trim();
     const strEnd      = document.querySelector('#txtJobEnd').value.trim();
     const strLocation = document.querySelector('#txtJobLocation').value.trim();
 
-    // Client-side validation before hitting the API
     if (strCompany === '' || strTitle === '') {
         Swal.fire({ title: 'Missing Fields', text: 'Company and Job Title are required.', icon: 'warning' });
         return;
@@ -154,7 +132,7 @@ async function addJob() {
         const objResponse = await fetch(strJobsApiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            // Send data as JSON in the request body per API conventions
+            // Send data as JSON in the request body
             body: JSON.stringify({
                 strCompany,
                 strTitle,
@@ -171,10 +149,8 @@ async function addJob() {
             return;
         }
 
-        // Clear the form fields after a successful add
+        // Clear the form fields and reload
         document.querySelector('#frmAddJob').reset();
-
-        // Reload the jobs list to show the new entry
         loadJobs();
 
     } catch (objError) {
@@ -185,7 +161,6 @@ async function addJob() {
 // ------------------------------------------------------------
 // deleteJob(intJobID)
 // Asks the user to confirm, then DELETEs the job and reloads.
-// @param {number} intJobID - the ID of the job to delete
 // ------------------------------------------------------------
 async function deleteJob(intJobID) {
     // Confirm before deleting since this also removes all responsibilities
@@ -197,7 +172,7 @@ async function deleteJob(intJobID) {
         confirmButtonText: 'Yes, delete it'
     });
 
-    // If the user clicked Cancel, stop here
+    // If the user clicked Cancel, stop
     if (!objConfirm.isConfirmed) return;
 
     try {
@@ -222,9 +197,7 @@ async function deleteJob(intJobID) {
 
 // ------------------------------------------------------------
 // addResponsibility(intJobID)
-// Reads the responsibility input for a specific job card and
-// POSTs it to the API. Reloads only that job's responsibilities.
-// @param {number} intJobID - the job to add the responsibility to
+// Reads the responsibility input for a specific job card and POSTs it to the API. 
 // ------------------------------------------------------------
 async function addResponsibility(intJobID) {
     // Each job card has its own input field identified by job ID
@@ -249,10 +222,8 @@ async function addResponsibility(intJobID) {
             return;
         }
 
-        // Clear just this job's input field
+        // Clear just this job's input field and reload its responsibilities
         document.querySelector(`#txtResp_${intJobID}`).value = '';
-
-        // Reload only this job's responsibilities, not the whole list
         loadResponsibilities(intJobID);
 
     } catch (objError) {
@@ -263,8 +234,7 @@ async function addResponsibility(intJobID) {
 // ------------------------------------------------------------
 // deleteResponsibility(intRespID, intJobID)
 // DELETEs a single responsibility and reloads that job's list.
-// @param {number} intRespID  - the responsibility to delete
-// @param {number} intJobID   - the parent job (to reload its list)
+// intJobID is needed to reload just that job's responsibilities.
 // ------------------------------------------------------------
 async function deleteResponsibility(intRespID, intJobID) {
     try {
@@ -287,9 +257,7 @@ async function deleteResponsibility(intRespID, intJobID) {
     }
 }
 
-// ------------------------------------------------------------
-// Wire up the Add Job button once the DOM is ready
-// ------------------------------------------------------------
+// Onload, set up event listeners
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('#btnAddJob').addEventListener('click', addJob);
 });

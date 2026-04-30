@@ -1,34 +1,25 @@
 // ============================================================
-// server.js - Entry point for the Resume Builder application
+// server.js - Entry point for the application
 // Sets up Express, static file serving, and all API routes
 // ============================================================
 
-// Load environment variables from .env file (e.g. GEMINI_API_KEY)
+// Load GEMINI_API_KEY from .env file
 require('dotenv').config();
 
 const express = require('express');
 const path = require('path');
 
-// Initialize database and create tables if they don't exist
+// Initialize database
 require('./db');
 
-// --- App Setup ---
+// Setup
 const app = express();
-const intPort = process.env.PORT || 3000;
-
-// Parse incoming JSON request bodies (used by POST/PUT routes)
+const intPort = 3000;
 app.use(express.json());
+app.use(express.static(path.join(__dirname))); // path.join(__dirname) means "the folder this file is in".
+app.use('/api', require('./api/routes')); // All API routes are defined in api/routes.js
 
-// Serve all static files (index.html, js/, css/) from the project root
-app.use(express.static(path.join(__dirname)));
-
-// --- API Routes ---
-// All routes are prefixed with /api/ per project conventions
-
-// All API routes are defined in api/routes.js
-app.use('/api', require('./routes'));
-
-// --- Start Server ---
+// Start Server
 app.listen(intPort, () => {
     console.log(`Resume Builder running at http://localhost:${intPort}`);
 });

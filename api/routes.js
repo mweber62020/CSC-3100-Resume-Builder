@@ -1,8 +1,7 @@
 // ============================================================
-// api/routes.js - All API routes for the ResuMint application
+// api/routes.js - All API routes for the application
 //
-// Mounted in server.js under /api/ so every route here is
-// accessed at /api/<route>.
+// Mounted in server.js. Every route is accessed by /api/<route>.
 //
 // Routes by section:
 //
@@ -39,29 +38,29 @@
 //     DELETE /api/awards/:id     - delete an award
 //
 //   SETTINGS
-//     GET  /api/settings         - get all settings as a flat object
-//     POST /api/settings         - save (insert or update) a setting
+//     GET  /api/settings         - get all settings
+//     POST /api/settings         - save a setting
 //
 //   GEMINI
-//     POST /api/gemini/suggest   - get AI suggestions for a piece of text
+//     POST /api/gemini/suggest   - get AI suggestions
 // ============================================================
 
 const express = require('express');
 const router = express.Router();
-
 const { db } = require('../db');
 const { GoogleGenAI } = require('@google/genai');
 
-// Gemini model - confirmed available for this account
+// Gemini model
 const strModel = 'gemini-2.0-flash-lite';
 
 // ============================================================
-// PROFILE
+// Profile routes
 // ============================================================
 
-// GET /api/profile - returns the profile, or {} if none saved yet
+// GET /api/profile - returns the profile
 router.get('/profile', (req, res) => {
     try {
+        // Prepare() compiles the SQL query, .get() runs it and returns the first row as an object (or undefined if no rows exist)
         const objProfile = db.prepare(`SELECT * FROM tblProfile LIMIT 1`).get();
         res.status(200).json(objProfile || {});
     } catch (objError) {
@@ -72,7 +71,7 @@ router.get('/profile', (req, res) => {
 // POST /api/profile - creates the profile for the first time
 router.post('/profile', (req, res) => {
     const { strFirstName, strLastName, strEmail, strPhone, strLocation, strSummary } = req.body;
-
+    // Validation: first name and email are required
     if (!strFirstName || strFirstName.trim() === '') {
         return res.status(400).json({ strError: 'First name is required.' });
     }
@@ -84,7 +83,7 @@ router.post('/profile', (req, res) => {
         const objResult = db.prepare(`
             INSERT INTO tblProfile (strFirstName, strLastName, strEmail, strPhone, strLocation, strSummary)
             VALUES (?, ?, ?, ?, ?, ?)
-        `).run(
+        `).run( // Each value goes into the ? in order. If a value is optional, check if it exists, otherwise pass null.
             strFirstName.trim(),
             strLastName    ? strLastName.trim()    : null,
             strEmail.trim(),
@@ -92,6 +91,7 @@ router.post('/profile', (req, res) => {
             strLocation    ? strLocation.trim()    : null,
             strSummary     ? strSummary.trim()     : null
         );
+        // Sends back lastInsertRowid (auto-generated primary key of the new row) so the frontend knows the profile's ID
         res.status(201).json({ intProfileID: objResult.lastInsertRowid });
     } catch (objError) {
         res.status(500).json({ strError: 'Failed to create profile.' });
@@ -102,7 +102,6 @@ router.post('/profile', (req, res) => {
 router.put('/profile/:id', (req, res) => {
     const intProfileID = parseInt(req.params.id);
     const { strFirstName, strLastName, strEmail, strPhone, strLocation, strSummary } = req.body;
-
     if (!strFirstName || strFirstName.trim() === '') {
         return res.status(400).json({ strError: 'First name is required.' });
     }
@@ -113,8 +112,7 @@ router.put('/profile/:id', (req, res) => {
     try {
         const objResult = db.prepare(`
             UPDATE tblProfile
-            SET strFirstName = ?, strLastName = ?, strEmail = ?,
-                strPhone = ?, strLocation = ?, strSummary = ?
+            SET strFirstName = ?, strLastName = ?, strEmail = ?, strPhone = ?, strLocation = ?, strSummary = ?
             WHERE intProfileID = ?
         `).run(
             strFirstName.trim(),
@@ -136,7 +134,7 @@ router.put('/profile/:id', (req, res) => {
 });
 
 // ============================================================
-// JOBS
+// Jobs routes
 // ============================================================
 
 // GET /api/jobs - returns all jobs
@@ -152,7 +150,7 @@ router.get('/jobs', (req, res) => {
 // POST /api/jobs - creates a new job
 router.post('/jobs', (req, res) => {
     const { strCompany, strTitle, strStartDate, strEndDate, strLocation } = req.body;
-
+    // Validation: company and title are required
     if (!strCompany || strCompany.trim() === '') {
         return res.status(400).json({ strError: 'Company is required.' });
     }
@@ -181,7 +179,6 @@ router.post('/jobs', (req, res) => {
 router.put('/jobs/:id', (req, res) => {
     const intJobID = parseInt(req.params.id);
     const { strCompany, strTitle, strStartDate, strEndDate, strLocation } = req.body;
-
     if (!strCompany || strCompany.trim() === '') {
         return res.status(400).json({ strError: 'Company is required.' });
     }
@@ -217,7 +214,7 @@ router.delete('/jobs/:id', (req, res) => {
     const intJobID = parseInt(req.params.id);
 
     try {
-        // Delete responsibilities first to avoid a foreign key conflict
+        // Delete responsibilities first to avoid foreign key conflicts
         db.prepare(`DELETE FROM tblResponsibilities WHERE intJobID = ?`).run(intJobID);
 
         const objResult = db.prepare(`DELETE FROM tblJobs WHERE intJobID = ?`).run(intJobID);
@@ -232,7 +229,7 @@ router.delete('/jobs/:id', (req, res) => {
 });
 
 // ============================================================
-// RESPONSIBILITIES
+// Responsibilities routes
 // ============================================================
 
 // GET /api/responsibilities?intJobID=1 - returns responsibilities for a job
@@ -244,6 +241,7 @@ router.get('/responsibilities', (req, res) => {
     }
 
     try {
+        // Get all responsibilities for the specified job ID
         const arrResponsibilities = db.prepare(`
             SELECT * FROM tblResponsibilities WHERE intJobID = ?
         `).all(intJobID);
@@ -256,7 +254,6 @@ router.get('/responsibilities', (req, res) => {
 // POST /api/responsibilities - adds a responsibility to a job
 router.post('/responsibilities', (req, res) => {
     const { intJobID, strDescription } = req.body;
-
     if (!intJobID) {
         return res.status(400).json({ strError: 'intJobID is required.' });
     }
@@ -302,9 +299,7 @@ router.delete('/responsibilities/:id', (req, res) => {
     const intResponsibilityID = parseInt(req.params.id);
 
     try {
-        const objResult = db.prepare(`
-            DELETE FROM tblResponsibilities WHERE intResponsibilityID = ?
-        `).run(intResponsibilityID);
+        const objResult = db.prepare(`DELETE FROM tblResponsibilities WHERE intResponsibilityID = ?`).run(intResponsibilityID);
 
         if (objResult.changes === 0) {
             return res.status(404).json({ strError: 'Responsibility not found.' });
@@ -316,7 +311,7 @@ router.delete('/responsibilities/:id', (req, res) => {
 });
 
 // ============================================================
-// SKILLS
+// Skills routes
 // ============================================================
 
 // GET /api/skills - returns all skills
@@ -364,7 +359,7 @@ router.delete('/skills/:id', (req, res) => {
 });
 
 // ============================================================
-// CERTIFICATIONS
+// Certifications routes
 // ============================================================
 
 // GET /api/certs - returns all certifications
@@ -416,7 +411,7 @@ router.delete('/certs/:id', (req, res) => {
 });
 
 // ============================================================
-// AWARDS
+// Awards routes
 // ============================================================
 
 // GET /api/awards - returns all awards
@@ -469,10 +464,10 @@ router.delete('/awards/:id', (req, res) => {
 });
 
 // ============================================================
-// SETTINGS
+// Settings routes
 // ============================================================
 
-// GET /api/settings - returns the one settings row directly
+// GET /api/settings - returns the settings row
 router.get('/settings', (req, res) => {
     try {
         const objSettings = db.prepare(`SELECT * FROM tblSettings LIMIT 1`).get();
@@ -482,7 +477,7 @@ router.get('/settings', (req, res) => {
     }
 });
 
-// PUT /api/settings - updates the one settings row
+// PUT /api/settings - updates the settings row
 // Accepts strGeminiApiKey and/or strResumeFont in the request body
 router.put('/settings', (req, res) => {
     const { strGeminiApiKey, strResumeFont } = req.body;
@@ -492,6 +487,7 @@ router.put('/settings', (req, res) => {
             UPDATE tblSettings
             SET strGeminiApiKey = ?, strResumeFont = ?
         `).run(
+            // If the value doesnt exists, for the API key, set to null, and for the font, default to 'Arial'.
             strGeminiApiKey ? strGeminiApiKey.trim() : null,
             strResumeFont   ? strResumeFont.trim()   : 'Arial'
         );
@@ -503,7 +499,7 @@ router.put('/settings', (req, res) => {
 });
 
 // ============================================================
-// GEMINI AI SUGGESTIONS
+// Gemini AI routes
 // ============================================================
 
 // POST /api/gemini/suggest - sends text to Gemini, returns suggestions
@@ -514,7 +510,7 @@ router.post('/gemini/suggest', async (req, res) => {
         return res.status(400).json({ strError: 'Text to review is required.' });
     }
 
-    // Get API key - prefer the one saved in DB, fall back to .env
+    // Get API key - prefer the one saved in DB, if nothing there, use .env
     let strApiKey = process.env.GEMINI_API_KEY;
     try {
         const objSetting = db.prepare(`SELECT strGeminiApiKey FROM tblSettings LIMIT 1`).get();
@@ -524,16 +520,17 @@ router.post('/gemini/suggest', async (req, res) => {
     if (!strApiKey) {
         return res.status(400).json({ strError: 'No Gemini API key found. Please add one in Settings.' });
     }
-
-    const strContext_clean = strContext ? strContext.trim() : 'resume text';
-    const strPrompt = `You are a professional resume coach. Review the following ${strContext_clean} and provide 2-3 concise, actionable suggestions to improve it for a job application. Be specific and professional. Keep your response brief and formatted as a short list.
+    // strContext is passed from frontend to describe what is being reviewed (e.g. 'professional summary').
+    // Route is reusable for different fields.
+    const strContextInsert = strContext ? strContext.trim() : 'resume text'; // Default to 'resume text' if no context provided
+    const strPrompt = `You are a professional resume coach. Review the following ${strContextInsert} and provide 2-3 concise, actionable suggestions to improve it for a job application. Be specific and professional. Keep your response brief and formatted as a short list.
 
 Text to review:
 "${strText.trim()}"`;
 
     try {
         const objGenAI = new GoogleGenAI({ apiKey: strApiKey });
-
+        // generateContent() sends the prompt to Gemini and returns the response.
         const objResponse = await objGenAI.models.generateContent({
             model: strModel,
             contents: strPrompt

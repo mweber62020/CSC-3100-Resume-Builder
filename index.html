@@ -4,25 +4,22 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ResuMint</title>
-
-    <!-- Pulse is a Bootswatch theme that replaces Bootstrap's default CSS -->
-    <!-- Do NOT also load bootstrap.min.css - Pulse already includes it -->
     <link rel="stylesheet" href="css/pulse.min.css" />
+    <!-- Favicon and other images will go here -->
 
 </head>
 <body>
 
     <!-- ============================================================
-         NAVBAR
-         Top navigation bar with links to each section of the SPA.
-         Clicking a link calls showSection() in app.js which hides
-         all sections and shows the one requested.
-         The brand/logo always takes the user back to the home page.
+         Navbar:
+         Navigation bar with links to each section.
+         Clicking a link calls showSection() in app.js which hides all sections and shows the one requested.
+         The brand/logo takes the user back to the home page.
     ============================================================ -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary" aria-label="Main navigation">
         <div class="container-fluid">
 
-            <!-- Brand / logo - clicking always returns to home -->
+            <!-- Brand/logo - clicking returns to home -->
             <a class="navbar-brand fw-bold" href="#" aria-label="ResuMint home"
                 onclick="showSection('divHome')">ResuMint</a>
 
@@ -36,11 +33,11 @@
 
             <!-- Nav links - each one shows a different section -->
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto" role="menubar">
-                    <li class="nav-item" role="none">
+                <ul class="navbar-nav me-auto" role="menubar"> <!-- 'ul' is list of items. 'role' is an ARIA attribute -->
+                    <li class="nav-item" role="none"> <!-- 'li' is a list item -->
                         <a class="nav-link" href="#" role="menuitem"
                             aria-label="Go to Profile section"
-                            onclick="showSection('divProfile'); loadProfile();">Profile</a>
+                            onclick="showSection('divProfile'); loadProfile();">Profile</a> <!-- href=# is a placeholder, using onclick instead of links -->
                     </li>
                     <li class="nav-item" role="none">
                         <a class="nav-link" href="#" role="menuitem"
@@ -69,7 +66,7 @@
                     </li>
                 </ul>
 
-                <!-- Settings link pinned to the right side of the navbar -->
+                <!-- Settings link on the right side of the navbar -->
                 <ul class="navbar-nav ms-auto" role="menubar">
                     <li class="nav-item" role="none">
                         <a class="nav-link" href="#" role="menuitem"
@@ -82,29 +79,27 @@
     </nav>
 
     <!-- ============================================================
-         MAIN CONTENT
-         All sections live here. Only one is visible at a time.
-         d-none is a Bootstrap class that sets display:none.
+         Main Content:
+         All sections go here. Only one is visible at a time.
          app.js handles showing/hiding via showSection().
     ============================================================ -->
     <main class="container mt-4" aria-label="Main content">
 
         <!-- --------------------------------------------------------
-             HOME SECTION
-             Landing page shown when the app first loads or when the
-             user clicks the ResuMint logo. Describes the app and
-             lists its main features.
+             Home Page:
+             Landing page shown when the app first loads or user clicks the logo.
+             Describes the app and lists main features.
         -------------------------------------------------------- -->
         <section id="divHome" aria-labelledby="hHome">
             <div class="text-center mb-5">
                 <h1 id="hHome" class="display-4 fw-bold">ResuMint</h1>
                 <p class="lead text-muted">Build a tailored resume for every job — powered by AI suggestions.</p>
                 <button type="button" class="btn btn-primary btn-lg mt-2"
-                    aria-label="Get started building your resume"
+                    aria-label="Get started"
                     onclick="showSection('divProfile')">Get Started</button>
             </div>
 
-            <!-- Feature cards - one per major feature of the app -->
+            <!-- Feature cards - lists major features of the app -->
             <div class="row g-4" aria-label="Feature list">
 
                 <div class="col-md-4">
@@ -183,15 +178,16 @@
         </section>
 
         <!-- --------------------------------------------------------
-             PROFILE SECTION
+             Profile Page:
              User enters their personal info: name, contact, summary.
-             This info appears at the top of every generated resume.
+             This appears at the top of the generated resume.
+             Can also get AI suggestions for improving the summary.
         -------------------------------------------------------- -->
         <section id="divProfile" class="d-none" aria-labelledby="hProfile">
             <h2 id="hProfile">Profile</h2>
             <p class="text-muted">Enter your personal and contact information.</p>
 
-            <form id="frmProfile" novalidate aria-label="Profile form">
+            <form id="frmProfile" novalidate aria-label="Profile form"> <!-- Using SweetAlert instead of default validation popups -->
                 <div class="row g-3">
                     <div class="col-md-6">
                         <label for="txtFirstName" class="form-label">First Name</label>
@@ -221,14 +217,13 @@
                     <div class="col-md-12">
                         <label for="txtSummary" class="form-label">Professional Summary</label>
                         <textarea class="form-control" id="txtSummary" rows="4"
-                            aria-label="Professional summary"
-                            placeholder="A brief summary of your professional background..."></textarea>
+                            aria-label="Professional summary" placeholder="A brief summary of your professional background..."></textarea>
                     </div>
                 </div>
 
-                <!-- AI suggestion area - shown and filled in by gemini.js -->
+                <!-- AI suggestion box - filled in by gemini.js -->
                 <div id="divProfileSuggestion" class="alert alert-info mt-3 d-none"
-                    role="alert" aria-live="polite" aria-label="AI suggestion"></div>
+                    role="alert" aria-live="polite" aria-label="AI suggestion"></div> <!-- alerts screen readers when it appears -->
 
                 <div class="mt-3">
                     <button type="button" class="btn btn-primary" id="btnSaveProfile"
@@ -249,10 +244,9 @@
         </section>
 
         <!-- --------------------------------------------------------
-             JOBS SECTION
-             User adds jobs they have held. Each job can have multiple
-             responsibilities. When building the resume the user picks
-             which jobs and responsibilities to include.
+             Jobs Page:
+             User adds jobs they have held. Each job can have multiple responsibilities.
+             When building the resume the user can pick which jobs and responsibilities to include.
         -------------------------------------------------------- -->
         <section id="divJobs" class="d-none" aria-labelledby="hJobs">
             <h2 id="hJobs">Jobs</h2>
@@ -267,7 +261,7 @@
                             <div class="col-md-6">
                                 <label for="txtJobCompany" class="form-label">Company</label>
                                 <input type="text" class="form-control" id="txtJobCompany"
-                                    aria-label="Company name" placeholder="Acme Corp" required />
+                                    aria-label="Company name" placeholder="ResuMint Corp" required />
                             </div>
                             <div class="col-md-6">
                                 <label for="txtJobTitle" class="form-label">Job Title</label>
@@ -310,9 +304,9 @@
         </section>
 
         <!-- --------------------------------------------------------
-             SKILLS SECTION
-             User adds skills optionally grouped by category
-             (e.g. "Programming Languages", "Tools", etc.)
+             Skills Page:
+             User adds skills optionally grouped by category.
+             When building the resume the user can pick which skills to include.
         -------------------------------------------------------- -->
         <section id="divSkills" class="d-none" aria-labelledby="hSkills">
             <h2 id="hSkills">Skills</h2>
@@ -356,8 +350,9 @@
         </section>
 
         <!-- --------------------------------------------------------
-             CERTIFICATIONS SECTION
+             Certifications Page:
              User adds certifications they have earned.
+            When building the resume the user can pick which certifications to include.
         -------------------------------------------------------- -->
         <section id="divCertifications" class="d-none" aria-labelledby="hCertifications">
             <h2 id="hCertifications">Certifications</h2>
@@ -404,8 +399,9 @@
         </section>
 
         <!-- --------------------------------------------------------
-             AWARDS SECTION
+             Awards Page:
              User adds awards and achievements.
+            When building the resume the user can pick which awards to include.
         -------------------------------------------------------- -->
         <section id="divAwards" class="d-none" aria-labelledby="hAwards">
             <h2 id="hAwards">Awards</h2>
@@ -424,7 +420,7 @@
                             <div class="col-md-4">
                                 <label for="txtAwardIssuer" class="form-label">Issuing Organization</label>
                                 <input type="text" class="form-control" id="txtAwardIssuer"
-                                    aria-label="Issuing organization" placeholder="Acme Corp" />
+                                    aria-label="Issuing organization" placeholder="ResuMint Corp" />
                             </div>
                             <div class="col-md-2">
                                 <label for="txtAwardDate" class="form-label">Date</label>
@@ -460,18 +456,17 @@
         </section>
 
         <!-- --------------------------------------------------------
-             BUILD RESUME SECTION
-             User selects which jobs, skills, certs, and awards to
-             include, then previews and prints their resume.
+             Build Resume Page:
+             User selects which items to include, then previews or prints their resume.
         -------------------------------------------------------- -->
         <section id="divResume" class="d-none" aria-labelledby="hResume">
             <h2 id="hResume">Build Resume</h2>
             <p class="text-muted">Select what to include and preview your resume.</p>
 
-            <!-- Selection UI - rendered by resume.js when this section loads -->
+            <!-- Selection UI - rendered by resume.js -->
             <div id="divResumeSelections" aria-label="Resume content selections" aria-live="polite"></div>
 
-            <!-- Generate and Print buttons -->
+            <!-- Generate preview and print buttons -->
             <div class="d-flex gap-2 mt-4">
                 <button type="button" class="btn btn-primary" id="btnGenerateResume"
                     aria-label="Generate resume preview">Generate Preview</button>
@@ -479,14 +474,13 @@
                     aria-label="Print resume">Print / Save as PDF</button>
             </div>
 
-            <!-- Resume preview - this is what gets printed -->
-            <!-- The print CSS in the <style> block below hides everything
-                 except this div when the user prints -->
+            <!-- Resume preview is rendered here for the user to review -->
+            <!-- Printing opens a new window containing only the resume HTML and calls window.print() from there -->
             <div id="divResumePreview" class="mt-4" aria-label="Resume preview" aria-live="polite"></div>
         </section>
 
         <!-- --------------------------------------------------------
-             SETTINGS SECTION
+             Settings Page:
              User saves their Gemini API key and resume preferences.
              All settings are stored in tblSettings in the database.
         -------------------------------------------------------- -->
@@ -540,7 +534,7 @@
                     <p class="card-text text-muted">
                         Switch between light and dark mode for the app interface.
                     </p>
-                    <!-- Bootstrap 5.3 form-check toggle switch -->
+                    <!-- Toggle switch -->
                     <div class="form-check form-switch">
                         <input class="form-check-input" type="checkbox" role="switch"
                             id="chkDarkMode" aria-label="Toggle dark mode" />
@@ -553,19 +547,11 @@
 
     </main>
 
-    <!-- ============================================================
-         LIBRARIES
-         Loaded at the bottom so the HTML renders before scripts run.
-         Bootstrap bundle includes Popper.js for dropdowns/modals.
-    ============================================================ -->
+    <!-- Libraries -->
     <script src="js/lib/bootstrap.bundle.min.js"></script>
     <script src="js/lib/sweetalert2@11.min.js"></script>
 
-    <!-- ============================================================
-         APP SCRIPTS
-         app.js must be loaded last since it depends on the DOM
-         and Bootstrap being fully loaded above.
-    ============================================================ -->
+    <!-- App Scripts -->
     <script src="js/app.js"></script>
     <script src="js/jobs.js"></script>
     <script src="js/skills.js"></script>

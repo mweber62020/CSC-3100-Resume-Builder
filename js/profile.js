@@ -1,25 +1,16 @@
 // ============================================================
 // profile.js - Frontend logic for the Profile section
-//
-// The profile is a single record. On load we check if one
-// exists and populate the form. On save we POST if it's new
-// or PUT if it already exists.
-//
-// We store the profile ID in a variable so we know which
-// record to update when the user saves changes.
+// Handles loading and saving the user's profile information.
 // ============================================================
 
 const strProfileApiUrl = '/api/profile';
 
 // Holds the profile ID once the profile has been saved.
-// null means no profile exists yet — first save will POST.
-// Any number means a profile exists — subsequent saves PUT.
 let intCurrentProfileID = null;
 
 // ------------------------------------------------------------
 // loadProfile()
 // Fetches the profile from the API and populates the form.
-// Called when the Profile nav link is clicked.
 // ------------------------------------------------------------
 async function loadProfile() {
     try {
@@ -32,11 +23,11 @@ async function loadProfile() {
 
             // Populate each form field with the saved value
             document.querySelector('#txtFirstName').value = objProfile.strFirstName || '';
-            document.querySelector('#txtLastName').value  = objProfile.strLastName  || '';
-            document.querySelector('#txtEmail').value     = objProfile.strEmail     || '';
-            document.querySelector('#txtPhone').value     = objProfile.strPhone     || '';
-            document.querySelector('#txtLocation').value  = objProfile.strLocation  || '';
-            document.querySelector('#txtSummary').value   = objProfile.strSummary   || '';
+            document.querySelector('#txtLastName').value = objProfile.strLastName || '';
+            document.querySelector('#txtEmail').value = objProfile.strEmail || '';
+            document.querySelector('#txtPhone').value = objProfile.strPhone || '';
+            document.querySelector('#txtLocation').value = objProfile.strLocation || '';
+            document.querySelector('#txtSummary').value = objProfile.strSummary || '';
         }
     } catch (objError) {
         Swal.fire({ title: 'Error', text: 'Could not load profile.', icon: 'error' });
@@ -45,9 +36,7 @@ async function loadProfile() {
 
 // ------------------------------------------------------------
 // saveProfile()
-// Reads the form values, validates them, then either POSTs
-// (first save) or PUTs (update) depending on whether a profile
-// already exists.
+// Reads the form values, validates them, then either POSTs (first save) or PUTs (update)
 // ------------------------------------------------------------
 async function saveProfile() {
     const strFirstName = document.querySelector('#txtFirstName').value.trim();
@@ -57,7 +46,6 @@ async function saveProfile() {
     const strLocation  = document.querySelector('#txtLocation').value.trim();
     const strSummary   = document.querySelector('#txtSummary').value.trim();
 
-    // Client-side validation
     if (strFirstName === '') {
         Swal.fire({ title: 'Missing Field', text: 'First name is required.', icon: 'warning' });
         return;
@@ -67,7 +55,7 @@ async function saveProfile() {
         return;
     }
 
-    // Build the request body - same fields for both POST and PUT
+    // Build the request body
     const objBody = { strFirstName, strLastName, strEmail, strPhone, strLocation, strSummary };
 
     try {
@@ -114,12 +102,9 @@ async function saveProfile() {
     }
 }
 
-// ------------------------------------------------------------
-// Wire up buttons and load profile once the DOM is ready
-// ------------------------------------------------------------
+// Onload, set up event listeners
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('#btnSaveProfile').addEventListener('click', saveProfile);
-
-    // Load the profile immediately so the form is pre-filled on arrival
+    // Load the profile on arrival
     loadProfile();
 });

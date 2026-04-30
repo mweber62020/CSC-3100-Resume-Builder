@@ -1,21 +1,13 @@
 // ============================================================
 // resume.js - Frontend logic for the Resume Builder section
-//
 // Loads all saved data, renders a selection UI with checkboxes,
 // generates a formatted resume preview, and handles printing.
-//
-// Functions:
-//   loadResumeBuilder()   - fetches all data and renders selection UI
-//   renderSelections()    - builds the checkbox UI from loaded data
-//   generatePreview()     - builds the resume HTML from selections
-//   printResume()         - triggers the browser print dialog
 // ============================================================
 
-// Holds all data fetched from the API so generatePreview()
-// can access it without making additional requests
+// Holds all data fetched from the API
 let objAllData = {
     objProfile:  {},
-    arrJobs:     [],  // each job also gets an arrResponsibilities property
+    arrJobs:     [],
     arrSkills:   [],
     arrCerts:    [],
     arrAwards:   [],
@@ -24,9 +16,7 @@ let objAllData = {
 
 // ------------------------------------------------------------
 // loadResumeBuilder()
-// Fetches all data from the API in parallel, then renders
-// the selection UI. Called when the Build Resume nav link
-// or the Awards Next button is clicked.
+// Fetches all data from the API in parallel, then renders the selection UI.
 // ------------------------------------------------------------
 async function loadResumeBuilder() {
     const divSelections = document.querySelector('#divResumeSelections');
@@ -35,7 +25,6 @@ async function loadResumeBuilder() {
     try {
         // Fetch profile, jobs, skills, certs, awards, and settings all at once.
         // Promise.all() runs them in parallel so we don't wait for each one
-        // sequentially - much faster than awaiting them one by one.
         const [objProfileRes, objJobsRes, objSkillsRes, objCertsRes, objAwardsRes, objSettingsRes] =
             await Promise.all([
                 fetch('/api/profile'),
@@ -53,10 +42,9 @@ async function loadResumeBuilder() {
         objAllData.arrAwards  = await objAwardsRes.json();
 
         const objSettings = await objSettingsRes.json();
-        objAllData.strFont = objSettings.strResumeFont || 'Arial';
+        objAllData.strFont = objSettings.strResumeFont || 'Arial'; // default to Arial
 
-        // For each job, fetch its responsibilities and attach them
-        // directly to the job object so we have everything in one place
+        // For each job, get its responsibilities and attach them to the job object
         await Promise.all(objAllData.arrJobs.map(async (objJob) => {
             const objRespRes = await fetch(`/api/responsibilities?intJobID=${objJob.intJobID}`);
             objJob.arrResponsibilities = await objRespRes.json();
@@ -65,14 +53,13 @@ async function loadResumeBuilder() {
         renderSelections();
 
     } catch (objError) {
-        divSelections.innerHTML = '<p class="text-danger">Could not load data. Is the server running?</p>';
+        divSelections.innerHTML = '<p class="text-danger">Could not load data.</p>';
     }
 }
 
 // ------------------------------------------------------------
 // renderSelections()
-// Builds the checkbox UI from the loaded data so the user
-// can pick what to include in their resume.
+// Builds the checkbox UI so the user can pick what to include in their resume.
 // ------------------------------------------------------------
 function renderSelections() {
     const divSelections = document.querySelector('#divResumeSelections');
@@ -80,7 +67,7 @@ function renderSelections() {
     // Build each section only if there's data to show
     let strHTML = '<div class="row g-4">';
 
-    // --- Jobs and Responsibilities ---
+    // Jobs and Responsibilities
     strHTML += `
         <div class="col-md-6">
             <div class="card h-100" aria-label="Select jobs and responsibilities">
@@ -129,10 +116,9 @@ function renderSelections() {
             `;
         });
     }
-
     strHTML += `</div></div></div>`;
 
-    // --- Skills ---
+    // Skills
     strHTML += `
         <div class="col-md-6">
             <div class="card h-100" aria-label="Select skills">
@@ -166,7 +152,7 @@ function renderSelections() {
 
     strHTML += `</div></div></div>`;
 
-    // --- Certifications ---
+    // Certifications
     strHTML += `
         <div class="col-md-6">
             <div class="card h-100" aria-label="Select certifications">
@@ -201,7 +187,7 @@ function renderSelections() {
 
     strHTML += `</div></div></div>`;
 
-    // --- Awards ---
+    // Awards
     strHTML += `
         <div class="col-md-6">
             <div class="card h-100" aria-label="Select awards">
@@ -233,9 +219,7 @@ function renderSelections() {
             `;
         });
     }
-
     strHTML += `</div></div></div>`;
-
     strHTML += '</div>'; // close row
 
     divSelections.innerHTML = strHTML;
@@ -243,13 +227,12 @@ function renderSelections() {
 
 // ------------------------------------------------------------
 // toggleJobResponsibilities(intJobID, blnChecked)
-// When a job checkbox is checked, automatically check all its
-// responsibilities. When unchecked, uncheck them all.
-// @param {number}  intJobID   - the job that was toggled
-// @param {boolean} blnChecked - whether it was checked or unchecked
+// When a job checkbox is checked, automatically check all its responsibilities.
 // ------------------------------------------------------------
 function toggleJobResponsibilities(intJobID, blnChecked) {
+    // Find all responsibility checkboxes for this job and set them to the same checked state
     const arrRespChecks = document.querySelectorAll(`#divRespChecks_${intJobID} .resp-check`);
+    // If the job is being unchecked, also uncheck all its responsibilities
     arrRespChecks.forEach((elCheck) => {
         elCheck.checked = blnChecked;
     });
@@ -258,13 +241,14 @@ function toggleJobResponsibilities(intJobID, blnChecked) {
 // ------------------------------------------------------------
 // toggleAll(strType)
 // Selects or deselects all checkboxes in a section.
-// Works as a toggle - if all are checked, unchecks all; otherwise checks all.
-// @param {string} strType - 'job', 'skill', 'cert', or 'award'
+// strType matches the CSS class prefix: 'job', 'skill', 'cert', or 'award'.
 // ------------------------------------------------------------
 function toggleAll(strType) {
+    // Find all checkboxes of the given type
     const arrChecks = document.querySelectorAll(`.${strType}-check`);
     // If every checkbox is already checked, uncheck all - otherwise check all
     const blnAllChecked = Array.from(arrChecks).every((el) => el.checked);
+    // Toggle each checkbox to the opposite of the current "all checked" state
     arrChecks.forEach((el) => {
         el.checked = !blnAllChecked;
         // If it's a job checkbox, also toggle its responsibilities
@@ -277,22 +261,10 @@ function toggleAll(strType) {
 
 // ------------------------------------------------------------
 // generatePreview()
-// Reads all checked checkboxes, filters the data to only the
-// selected items, and renders a formatted resume into
-// divResumePreview. Also applies the saved font preference.
+// Reads all checked checkboxes, filters the data to only the selected items, and renders a formatted resume into divResumePreview.
 // ------------------------------------------------------------
 function generatePreview() {
-    // Guard: if the selection UI hasn't been loaded yet, tell the user
-    if (!objAllData.objProfile.intProfileID && objAllData.arrJobs.length === 0) {
-        Swal.fire({
-            title: 'No Data Loaded',
-            text: 'Please use the Build Resume nav link or the Next button on the Awards page to load your data first.',
-            icon: 'warning'
-        });
-        return;
-    }
-
-    // Collect selected IDs from each section
+    // Get selected data from each section by getting checked checkboxes that have the respective class, then maps to their IDs so we can filter.
     const arrSelectedJobIDs  = [...document.querySelectorAll('.job-check:checked')].map(el => parseInt(el.value));
     const arrSelectedRespIDs = [...document.querySelectorAll('.resp-check:checked')].map(el => parseInt(el.value));
     const arrSelectedSkillIDs = [...document.querySelectorAll('.skill-check:checked')].map(el => parseInt(el.value));
@@ -301,9 +273,7 @@ function generatePreview() {
 
     const objProfile = objAllData.objProfile;
 
-    // Build the resume HTML string
-    // Inline styles are used here intentionally so the formatting
-    // survives when printed - @media print removes all Bootstrap classes
+    // Build the resume HTML as a string
     let strResume = `
         <div style="font-family: ${objAllData.strFont}, sans-serif; color: #222; max-width: 750px; margin: 0 auto; line-height: 1.5;">
 
@@ -314,13 +284,13 @@ function generatePreview() {
                 </h1>
                 <p style="margin: 4px 0; font-size: 14px; color: #555;">
                     ${[objProfile.strEmail, objProfile.strPhone, objProfile.strLocation]
-                        .filter(Boolean).join(' &nbsp;|&nbsp; ')}
+                        .filter(Boolean).join(' &nbsp;|&nbsp; ')} <!-- Separate with a pipe -->
                 </p>
             </div>
             <hr style="border: 1px solid #222; margin-bottom: 16px;" />
     `;
 
-    // --- Professional Summary ---
+    // Professional Summary
     if (objProfile.strSummary) {
         strResume += `
             <div style="margin-bottom: 16px;">
@@ -333,8 +303,8 @@ function generatePreview() {
         `;
     }
 
-    // --- Work Experience ---
-    // Only include jobs that were checked, and only the responsibilities that were checked
+    // Job and Responsibilities section
+    // Only include checked jobs and responsibilities.
     const arrSelectedJobs = objAllData.arrJobs.filter(
         (objJob) => arrSelectedJobIDs.includes(objJob.intJobID)
     );
@@ -349,10 +319,9 @@ function generatePreview() {
         `;
 
         arrSelectedJobs.forEach((objJob) => {
-            // Build the date/location line, skipping empty fields
+            // Build the date/location line with available info
             const strMeta = [
-                objJob.strLocation,
-                [objJob.strStartDate, objJob.strEndDate].filter(Boolean).join(' – ')
+                objJob.strLocation, [objJob.strStartDate, objJob.strEndDate].filter(Boolean).join(' - ')
             ].filter(Boolean).join(' &nbsp;|&nbsp; ');
 
             strResume += `
@@ -364,7 +333,7 @@ function generatePreview() {
                     <div style="font-size: 13px; color: #444; margin-bottom: 4px;">${objJob.strCompany}</div>
             `;
 
-            // Filter responsibilities to only the ones the user checked
+            // Filter responsibilities to only the checked ones
             const arrSelectedResps = objJob.arrResponsibilities.filter(
                 (objResp) => arrSelectedRespIDs.includes(objResp.intResponsibilityID)
             );
@@ -376,23 +345,22 @@ function generatePreview() {
                 });
                 strResume += `</ul>`;
             }
-
             strResume += `</div>`;
         });
-
         strResume += `</div>`;
     }
 
-    // --- Skills ---
+    // Skills section
+    // Only include checked skills.
     const arrSelectedSkills = objAllData.arrSkills.filter(
         (objSkill) => arrSelectedSkillIDs.includes(objSkill.intSkillID)
     );
 
     if (arrSelectedSkills.length > 0) {
-        // Group selected skills by category for a clean layout
+        // Group skills by category
         const objGrouped = {};
         arrSelectedSkills.forEach((objSkill) => {
-            const strCat = objSkill.strCategory || 'Skills';
+            const strCat = objSkill.strCategory || 'Skills'; // default category
             if (!objGrouped[strCat]) objGrouped[strCat] = [];
             objGrouped[strCat].push(objSkill.strName);
         });
@@ -404,7 +372,7 @@ function generatePreview() {
                     Skills
                 </h2>
         `;
-
+        // Returns an array of the object's keys: category name.
         Object.keys(objGrouped).forEach((strCat) => {
             strResume += `
                 <div style="font-size: 13px; margin-bottom: 4px;">
@@ -412,11 +380,11 @@ function generatePreview() {
                 </div>
             `;
         });
-
         strResume += `</div>`;
     }
 
-    // --- Certifications ---
+    // Certifications section
+    // Only include checked certifications.
     const arrSelectedCerts = objAllData.arrCerts.filter(
         (objCert) => arrSelectedCertIDs.includes(objCert.intCertID)
     );
@@ -441,7 +409,8 @@ function generatePreview() {
         strResume += `</div>`;
     }
 
-    // --- Awards ---
+    // Awards section
+    // Only include checked awards.
     const arrSelectedAwards = objAllData.arrAwards.filter(
         (objAward) => arrSelectedAwardIDs.includes(objAward.intAwardID)
     );
@@ -466,29 +435,22 @@ function generatePreview() {
         });
         strResume += `</div>`;
     }
-
     strResume += `</div>`; // close outer resume div
 
-    // Inject the finished resume into the preview area
+    // Put resume into preview area
     document.querySelector('#divResumePreview').innerHTML = strResume;
 
-    // Scroll the preview into view so the user sees it immediately
+    // Scroll preview into view immediately
     document.querySelector('#divResumePreview').scrollIntoView({ behavior: 'smooth' });
 }
 
 // ------------------------------------------------------------
 // printResume()
-// Opens a new browser window containing only the resume HTML,
-// then triggers the print dialog on that window.
-//
-// We use a new window instead of printing the main page because
-// this is a SPA - hiding everything except the preview via CSS
-// is unreliable when content is nested inside hidden parent elements.
-// A new window gives us a clean page with just the resume.
+// Opens a new window containing only the resume HTML and triggers print dialog there.
 // ------------------------------------------------------------
 function printResume() {
     const divPreview = document.querySelector('#divResumePreview');
-
+    // Make sure there's something in preview before printing
     if (!divPreview.innerHTML.trim()) {
         Swal.fire({
             title: 'No Preview',
@@ -501,7 +463,7 @@ function printResume() {
     // Open a blank new window
     const objPrintWindow = window.open('', '_blank');
 
-    // Write a minimal HTML page containing only the resume content
+    // Write an HTML page containing only the resume content
     objPrintWindow.document.write(`
         <!DOCTYPE html>
         <html lang="en">
@@ -519,20 +481,18 @@ function printResume() {
         </html>
     `);
 
-    // Close the document stream so the browser knows it's fully loaded
+    // Close the document stream and focus the window
     objPrintWindow.document.close();
     objPrintWindow.focus();
 
-    // Small delay to let the content render before the print dialog opens
+    // Small delay to make sure content loads
     setTimeout(() => {
         objPrintWindow.print();
         objPrintWindow.close();
     }, 250);
 }
 
-// ------------------------------------------------------------
-// Wire up buttons once the DOM is ready
-// ------------------------------------------------------------
+// Onload, set up event listeners
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('#btnGenerateResume').addEventListener('click', generatePreview);
     document.querySelector('#btnPrintResume').addEventListener('click', printResume);
