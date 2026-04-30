@@ -22,6 +22,11 @@
 //     PUT    /api/responsibilities/:id         - update a responsibility
 //     DELETE /api/responsibilities/:id         - delete a responsibility
 //
+//   EDUCATION
+//     GET    /api/education      - get all education entries
+//     POST   /api/education      - create an education entry
+//     DELETE /api/education/:id  - delete an education entry
+//
 //   SKILLS
 //     GET    /api/skills         - get all skills
 //     POST   /api/skills         - create a skill
@@ -308,6 +313,61 @@ router.delete('/responsibilities/:id', (req, res) => {
         res.status(200).json({ strMessage: 'Responsibility deleted successfully.' });
     } catch (objError) {
         res.status(500).json({ strError: 'Failed to delete responsibility.' });
+    }
+});
+
+
+// ============================================================
+// Education routes
+// ============================================================
+
+// GET /api/education - returns all education entries
+router.get('/education', (req, res) => {
+    try {
+        const arrEducation = db.prepare(`SELECT * FROM tblEducation ORDER BY strGradYear DESC`).all();
+        res.status(200).json(arrEducation);
+    } catch (objError) {
+        res.status(500).json({ strError: 'Failed to retrieve education.' });
+    }
+});
+
+// POST /api/education - creates an education entry
+router.post('/education', (req, res) => {
+    const { strSchool, strDegree, strFieldOfStudy, strGradYear } = req.body;
+
+    if (!strSchool || strSchool.trim() === '') {
+        return res.status(400).json({ strError: 'School name is required.' });
+    }
+
+    try {
+        const objResult = db.prepare(`
+            INSERT INTO tblEducation (strSchool, strDegree, strFieldOfStudy, strGradYear)
+            VALUES (?, ?, ?, ?)
+        `).run(
+            strSchool.trim(),
+            strDegree       ? strDegree.trim()       : null,
+            strFieldOfStudy ? strFieldOfStudy.trim() : null,
+            strGradYear     ? strGradYear.trim()     : null
+        );
+        res.status(201).json({ intEducationID: objResult.lastInsertRowid });
+    } catch (objError) {
+        res.status(500).json({ strError: 'Failed to create education entry.' });
+    }
+});
+
+// DELETE /api/education/:id - deletes an education entry
+router.delete('/education/:id', (req, res) => {
+    const intEducationID = parseInt(req.params.id);
+
+    try {
+        const objResult = db.prepare(`DELETE FROM tblEducation WHERE intEducationID = ?`).run(intEducationID);
+
+        if (objResult.changes === 0) {
+            return res.status(404).json({ strError: 'Education entry not found.' });
+        }
+        res.status(200).json({ strMessage: 'Education entry deleted successfully.' });
+    } catch (objError) {
+        res.status(500).json({ strError: 'Failed to delete education entry.' });
     }
 });
 

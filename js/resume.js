@@ -6,12 +6,13 @@
 
 // Holds all data fetched from the API
 let objAllData = {
-    objProfile:  {},
-    arrJobs:     [],
-    arrSkills:   [],
-    arrCerts:    [],
-    arrAwards:   [],
-    strFont:     'Arial'
+    objProfile:   {},
+    arrEducation: [],
+    arrJobs:      [],
+    arrSkills:    [],
+    arrCerts:     [],
+    arrAwards:    [],
+    strFont:      'Arial'
 };
 
 // ------------------------------------------------------------
@@ -23,11 +24,11 @@ async function loadResumeBuilder() {
     divSelections.innerHTML = '<p class="text-muted">Loading your data...</p>';
 
     try {
-        // Fetch profile, jobs, skills, certs, awards, and settings all at once.
-        // Promise.all() runs them in parallel so we don't wait for each one
-        const [objProfileRes, objJobsRes, objSkillsRes, objCertsRes, objAwardsRes, objSettingsRes] =
+        // Fetch all data at once. Promise.all() runs them in parallel so we don't wait for each one
+        const [objProfileRes, objEduRes, objJobsRes, objSkillsRes, objCertsRes, objAwardsRes, objSettingsRes] =
             await Promise.all([
                 fetch('/api/profile'),
+                fetch('/api/education'),
                 fetch('/api/jobs'),
                 fetch('/api/skills'),
                 fetch('/api/certs'),
@@ -35,11 +36,12 @@ async function loadResumeBuilder() {
                 fetch('/api/settings')
             ]);
 
-        objAllData.objProfile = await objProfileRes.json();
-        objAllData.arrJobs    = await objJobsRes.json();
-        objAllData.arrSkills  = await objSkillsRes.json();
-        objAllData.arrCerts   = await objCertsRes.json();
-        objAllData.arrAwards  = await objAwardsRes.json();
+        objAllData.objProfile   = await objProfileRes.json();
+        objAllData.arrEducation = await objEduRes.json();
+        objAllData.arrJobs      = await objJobsRes.json();
+        objAllData.arrSkills    = await objSkillsRes.json();
+        objAllData.arrCerts     = await objCertsRes.json();
+        objAllData.arrAwards    = await objAwardsRes.json();
 
         const objSettings = await objSettingsRes.json();
         objAllData.strFont = objSettings.strResumeFont || 'Arial'; // default to Arial
@@ -66,6 +68,42 @@ function renderSelections() {
 
     // Build each section only if there's data to show
     let strHTML = '<div class="row g-4">';
+
+    // Education
+    strHTML += `
+        <div class="col-md-6">
+            <div class="card h-100" aria-label="Select education">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>Education</span>
+                    <button type="button" class="btn btn-sm btn-outline-secondary"
+                        aria-label="Select all education"
+                        onclick="toggleAll('education')">Select All</button>
+                </div>
+                <div class="card-body">
+    `;
+
+    if (objAllData.arrEducation.length === 0) {
+        strHTML += '<p class="text-muted small">No education added yet.</p>';
+    } else {
+        objAllData.arrEducation.forEach((objEdu) => {
+            strHTML += `
+                <div class="form-check">
+                    <input class="form-check-input education-check" type="checkbox"
+                        id="chkEdu_${objEdu.intEducationID}"
+                        value="${objEdu.intEducationID}"
+                        aria-label="Include education: ${objEdu.strSchool}" />
+                    <label class="form-check-label small" for="chkEdu_${objEdu.intEducationID}">
+                        ${objEdu.strSchool}
+                        ${objEdu.strDegree ? `— ${objEdu.strDegree}` : ''}
+                        ${objEdu.strFieldOfStudy ? `in ${objEdu.strFieldOfStudy}` : ''}
+                        ${objEdu.strGradYear ? `(${objEdu.strGradYear})` : ''}
+                    </label>
+                </div>
+            `;
+        });
+    }
+
+    strHTML += `</div></div></div>`;
 
     // Jobs and Responsibilities
     strHTML += `
@@ -265,6 +303,7 @@ function toggleAll(strType) {
 // ------------------------------------------------------------
 function generatePreview() {
     // Get selected data from each section by getting checked checkboxes that have the respective class, then maps to their IDs so we can filter.
+    const arrSelectedEduIDs  = [...document.querySelectorAll('.education-check:checked')].map(el => parseInt(el.value));
     const arrSelectedJobIDs  = [...document.querySelectorAll('.job-check:checked')].map(el => parseInt(el.value));
     const arrSelectedRespIDs = [...document.querySelectorAll('.resp-check:checked')].map(el => parseInt(el.value));
     const arrSelectedSkillIDs = [...document.querySelectorAll('.skill-check:checked')].map(el => parseInt(el.value));
@@ -301,6 +340,36 @@ function generatePreview() {
                 <p style="font-size: 13px; margin: 0;">${objProfile.strSummary}</p>
             </div>
         `;
+    }
+
+    // Education section
+    // Only include education entries that are checked.
+    const arrSelectedEdu = objAllData.arrEducation.filter(
+        (objEdu) => arrSelectedEduIDs.includes(objEdu.intEducationID)
+    );
+
+    if (arrSelectedEdu.length > 0) {
+        strResume += `
+            <div style="margin-bottom: 16px;">
+                <h2 style="font-size: 14px; text-transform: uppercase; letter-spacing: 1px;
+                            border-bottom: 1px solid #ccc; padding-bottom: 4px; margin-bottom: 8px;">
+                    Education
+                </h2>
+        `;
+        arrSelectedEdu.forEach((objEdu) => {
+            // Build the degree/field line from available info
+            const strDegreeLine = [objEdu.strDegree, objEdu.strFieldOfStudy].filter(Boolean).join(' in ');
+            strResume += `
+                <div style="font-size: 13px; margin-bottom: 6px;">
+                    <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                        <strong style="font-size: 14px;">${objEdu.strSchool}</strong>
+                        ${objEdu.strGradYear ? `<span style="font-size: 12px; color: #555;">${objEdu.strGradYear}</span>` : ''}
+                    </div>
+                    ${strDegreeLine ? `<div style="color: #444;">${strDegreeLine}</div>` : ''}
+                </div>
+            `;
+        });
+        strResume += `</div>`;
     }
 
     // Job and Responsibilities section

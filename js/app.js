@@ -7,6 +7,7 @@
 const arrSections = [
     'divHome',
     'divProfile',
+    'divEducation',
     'divJobs',
     'divSkills',
     'divCertifications',

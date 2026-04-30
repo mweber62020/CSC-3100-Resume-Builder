@@ -47,6 +47,15 @@ db.exec(`
         strCategory     TEXT
     );
 
+    -- Stores education history
+    CREATE TABLE IF NOT EXISTS tblEducation (
+        intEducationID  INTEGER PRIMARY KEY AUTOINCREMENT,
+        strSchool       TEXT NOT NULL,
+        strDegree       TEXT,
+        strFieldOfStudy TEXT,
+        strGradYear     TEXT
+    );
+
     -- Stores certifications
     CREATE TABLE IF NOT EXISTS tblCertifications (
         intCertID       INTEGER PRIMARY KEY AUTOINCREMENT,
