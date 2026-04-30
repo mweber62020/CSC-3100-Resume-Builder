@@ -46,14 +46,21 @@ async function saveProfile() {
     const strLocation  = document.querySelector('#txtLocation').value.trim();
     const strSummary   = document.querySelector('#txtSummary').value.trim();
 
+    // Clear any previous validation and check fields
+    document.querySelector('#txtFirstName').classList.remove('is-invalid');
+    document.querySelector('#txtEmail').classList.remove('is-invalid');
+
+    // Show inline errors on required fields and stop if anything is missing
+    let blnValid = true;
     if (strFirstName === '') {
-        Swal.fire({ title: 'Missing Field', text: 'First name is required.', icon: 'warning' });
-        return;
+        document.querySelector('#txtFirstName').classList.add('is-invalid');
+        blnValid = false;
     }
     if (strEmail === '') {
-        Swal.fire({ title: 'Missing Field', text: 'Email is required.', icon: 'warning' });
-        return;
+        document.querySelector('#txtEmail').classList.add('is-invalid');
+        blnValid = false;
     }
+    if (!blnValid) return;
 
     // Build the request body
     const objBody = { strFirstName, strLastName, strEmail, strPhone, strLocation, strSummary };

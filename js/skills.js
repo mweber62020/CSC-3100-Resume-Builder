@@ -72,8 +72,10 @@ async function addSkill() {
     const strName     = document.querySelector('#txtSkillName').value.trim();
     const strCategory = document.querySelector('#txtSkillCategory').value.trim();
 
+    // Clear any previous validation and check fields
+    document.querySelector('#txtSkillName').classList.remove('is-invalid');
     if (strName === '') {
-        Swal.fire({ title: 'Missing Field', text: 'Skill name is required.', icon: 'warning' });
+        document.querySelector('#txtSkillName').classList.add('is-invalid');
         return;
     }
 
@@ -93,6 +95,7 @@ async function addSkill() {
         }
 
         document.querySelector('#frmAddSkill').reset();
+        document.querySelector('#txtSkillName').classList.remove('is-invalid');
         loadSkills();
     } catch (objError) {
         Swal.fire({ title: 'Error', text: 'Could not add skill.', icon: 'error' });

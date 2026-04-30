@@ -123,10 +123,21 @@ async function addJob() {
     const strEnd      = document.querySelector('#txtJobEnd').value.trim();
     const strLocation = document.querySelector('#txtJobLocation').value.trim();
 
-    if (strCompany === '' || strTitle === '') {
-        Swal.fire({ title: 'Missing Fields', text: 'Company and Job Title are required.', icon: 'warning' });
-        return;
+    // Clear any previous validation state before re-checking
+    document.querySelector('#txtJobCompany').classList.remove('is-invalid');
+    document.querySelector('#txtJobTitle').classList.remove('is-invalid');
+
+    // Show inline errors on required fields and stop if anything is missing
+    let blnValid = true;
+    if (strCompany === '') {
+        document.querySelector('#txtJobCompany').classList.add('is-invalid');
+        blnValid = false;
     }
+    if (strTitle === '') {
+        document.querySelector('#txtJobTitle').classList.add('is-invalid');
+        blnValid = false;
+    }
+    if (!blnValid) return;
 
     try {
         const objResponse = await fetch(strJobsApiUrl, {
@@ -149,8 +160,10 @@ async function addJob() {
             return;
         }
 
-        // Clear the form fields and reload
+        // Clear any previous validation and check fields
         document.querySelector('#frmAddJob').reset();
+        document.querySelector('#txtJobCompany').classList.remove('is-invalid');
+        document.querySelector('#txtJobTitle').classList.remove('is-invalid');
         loadJobs();
 
     } catch (objError) {

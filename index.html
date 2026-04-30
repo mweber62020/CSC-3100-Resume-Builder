@@ -173,7 +173,31 @@
                         </div>
                     </div>
                 </div>
+            </div>
 
+            <!-- Attribution button -->
+            <div class="text-center mt-5">
+                <button type="button" class="btn btn-outline-secondary btn-sm"
+                    aria-label="View library credits"
+                    onclick="Swal.fire({
+                        title: 'Built With',
+                        icon: 'info',
+                        html: `
+                            <p>ResuMint is built using these open source libraries:</p>
+                            <ul class='text-start'>
+                                <li><strong>Express</strong> — web server framework for Node.js</li>
+                                <li><strong>better-sqlite3</strong> — synchronous SQLite database</li>
+                                <li><strong>Bootstrap 5</strong> — UI component and layout framework</li>
+                                <li><strong>Bootswatch Pulse</strong> — Bootstrap theme</li>
+                                <li><strong>SweetAlert2</strong> — popup and alerts</li>
+                                <li><strong>dotenv</strong> — loads environment variables</li>
+                                <li><strong>Google Gemini</strong> — AI suggestions via @google/genai</li>
+                            </ul>
+                            <p class='text-muted small mb-0'>Thank you developers and maintainers of these projects!</p>
+                        `
+                    })">
+                    Credits &amp; Libraries
+                </button>
             </div>
         </section>
 
@@ -187,12 +211,13 @@
             <h2 id="hProfile">Profile</h2>
             <p class="text-muted">Enter your personal and contact information.</p>
 
-            <form id="frmProfile" novalidate aria-label="Profile form"> <!-- Using SweetAlert instead of default validation popups -->
+            <form id="frmProfile" novalidate aria-label="Profile form">
                 <div class="row g-3">
                     <div class="col-md-6">
                         <label for="txtFirstName" class="form-label">First Name</label>
                         <input type="text" class="form-control" id="txtFirstName"
                             aria-label="First name" placeholder="John" required />
+                        <div class="invalid-feedback">First name is required.</div>
                     </div>
                     <div class="col-md-6">
                         <label for="txtLastName" class="form-label">Last Name</label>
@@ -203,6 +228,7 @@
                         <label for="txtEmail" class="form-label">Email</label>
                         <input type="email" class="form-control" id="txtEmail"
                             aria-label="Email address" placeholder="john@example.com" required />
+                        <div class="invalid-feedback">Email is required.</div>
                     </div>
                     <div class="col-md-6">
                         <label for="txtPhone" class="form-label">Phone</label>
@@ -262,11 +288,13 @@
                                 <label for="txtJobCompany" class="form-label">Company</label>
                                 <input type="text" class="form-control" id="txtJobCompany"
                                     aria-label="Company name" placeholder="ResuMint Corp" required />
+                                <div class="invalid-feedback">Company is required.</div>
                             </div>
                             <div class="col-md-6">
                                 <label for="txtJobTitle" class="form-label">Job Title</label>
                                 <input type="text" class="form-control" id="txtJobTitle"
                                     aria-label="Job title" placeholder="Software Developer" required />
+                                <div class="invalid-feedback">Job title is required.</div>
                             </div>
                             <div class="col-md-4">
                                 <label for="txtJobStart" class="form-label">Start Date</label>
@@ -321,6 +349,7 @@
                                 <label for="txtSkillName" class="form-label">Skill</label>
                                 <input type="text" class="form-control" id="txtSkillName"
                                     aria-label="Skill name" placeholder="JavaScript" required />
+                                <div class="invalid-feedback">Skill name is required.</div>
                             </div>
                             <div class="col-md-6">
                                 <label for="txtSkillCategory" class="form-label">
@@ -338,6 +367,16 @@
 
             <!-- List of saved skills rendered by skills.js -->
             <div id="divSkillList" aria-label="Saved skills list" aria-live="polite"></div>
+
+            <!-- AI suggestion box -->
+            <div class="mt-4">
+                <button type="button" class="btn btn-outline-secondary" id="btnSuggestSkills"
+                    aria-label="Get AI skill suggestions based on your jobs">
+                    Suggest Skills Based on My Jobs
+                </button>
+                <div id="divSkillsSuggestion" class="alert alert-info mt-3 d-none"
+                    role="alert" aria-live="polite" aria-label="AI skill suggestions"></div>
+            </div>
 
             <!-- Next button - takes the user to the Certifications section -->
             <div class="d-flex justify-content-end mt-4">
@@ -367,6 +406,7 @@
                                 <label for="txtCertName" class="form-label">Certification Name</label>
                                 <input type="text" class="form-control" id="txtCertName"
                                     aria-label="Certification name" placeholder="AWS Certified Developer" required />
+                                <div class="invalid-feedback">Certification name is required.</div>
                             </div>
                             <div class="col-md-4">
                                 <label for="txtCertIssuer" class="form-label">Issuing Organization</label>
@@ -416,6 +456,7 @@
                                 <label for="txtAwardName" class="form-label">Award Name</label>
                                 <input type="text" class="form-control" id="txtAwardName"
                                     aria-label="Award name" placeholder="Employee of the Year" required />
+                                <div class="invalid-feedback">Award name is required.</div>
                             </div>
                             <div class="col-md-4">
                                 <label for="txtAwardIssuer" class="form-label">Issuing Organization</label>

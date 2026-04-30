@@ -1,39 +1,35 @@
 // ============================================================
 // gemini.js - Frontend logic for AI suggestions
-// Provides a reusable function getAISuggestion() that any section can call
+// Two suggestion functions for the profile summary and skills.
 // ============================================================
 
-const strGeminiApiUrl = '/api/gemini/suggest';
+// API endpoints for Gemini suggestions
+const strGeminiSuggestUrl = '/api/gemini/suggest';
+const strGeminiSkillsUrl  = '/api/gemini/skills';
 
 // ------------------------------------------------------------
-// getAISuggestion(strInputID, strOutputID, strContext)
-// Reads text from a textarea, sends it to the Gemini backend, and displays the suggestion in a target div.
-// strContext describes what the text is so the route can be reused for other fields.
+// suggestProfileSummary()
+// Reads the profile summary, sends to Gemini, and displays suggestions.
 // ------------------------------------------------------------
-async function getAISuggestion(strInputID, strOutputID, strContext) {
-    const strText = document.querySelector(`#${strInputID}`).value.trim();
+async function suggestProfileSummary() {
+    const strText = document.querySelector('#txtSummary').value.trim();
 
     if (strText === '') {
-        Swal.fire({
-            title: 'Nothing to Review',
-            text: `Please enter your ${strContext} before requesting suggestions.`,
-            icon: 'warning'
-        });
+        Swal.fire({ title: 'Nothing to Review', text: 'Please enter a summary before requesting suggestions.', icon: 'warning' });
         return;
     }
 
-    const divOutput = document.querySelector(`#${strOutputID}`);
+    const divOutput = document.querySelector('#divProfileSuggestion');
 
-    // Show a loading state so the user knows something is happening.
+    // Show a loading state while waiting for Gemini to respond
     divOutput.classList.remove('d-none');
     divOutput.innerHTML = '<span aria-live="polite">Getting suggestions...</span>';
 
     try {
-        // Send the text and context to the API
-        const objResponse = await fetch(strGeminiApiUrl, {
+        const objResponse = await fetch(strGeminiSuggestUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ strText, strContext })
+            body: JSON.stringify({ strText })
         });
 
         const objData = await objResponse.json();
@@ -43,7 +39,7 @@ async function getAISuggestion(strInputID, strOutputID, strContext) {
             return;
         }
 
-        // Convert newlines in the response to <br> tags so the formatted list renders properly in the browser
+        // Convert newlines to <br> tags so the list renders properly in the browser
         const strFormatted = objData.strSuggestion.replace(/\n/g, '<br>');
         divOutput.innerHTML = `<strong>AI Suggestions:</strong><br><br>${strFormatted}`;
 
@@ -52,10 +48,53 @@ async function getAISuggestion(strInputID, strOutputID, strContext) {
     }
 }
 
+// ------------------------------------------------------------
+// suggestSkills()
+// Fetches user's saved jobs, sends to Gemini, and displays skill suggestions.
+// ------------------------------------------------------------
+async function suggestSkills() {
+    const divOutput = document.querySelector('#divSkillsSuggestion');
+
+    // Show a loading state while waiting
+    divOutput.classList.remove('d-none');
+    divOutput.innerHTML = '<span aria-live="polite">Getting suggestions...</span>';
+
+    try {
+        // Fetch the user's saved jobs
+        const objJobsResponse = await fetch('/api/jobs');
+        const arrJobs = await objJobsResponse.json();
+
+        if (arrJobs.length === 0) {
+            divOutput.innerHTML = '<strong>No jobs found.</strong> Add some jobs first so Gemini has something to base suggestions on.';
+            return;
+        }
+
+        // Build a string listing each job title and company
+        const strJobList = arrJobs.map((objJob) => `${objJob.strTitle} at ${objJob.strCompany}`).join(', ');
+
+        const objResponse = await fetch(strGeminiSkillsUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ strJobList })
+        });
+
+        const objData = await objResponse.json();
+
+        if (!objResponse.ok) {
+            divOutput.innerHTML = `<strong>Error:</strong> ${objData.strError}`;
+            return;
+        }
+
+        const strFormatted = objData.strSuggestion.replace(/\n/g, '<br>');
+        divOutput.innerHTML = `<strong>Suggested Skills:</strong><br><br>${strFormatted}`;
+
+    } catch (objError) {
+        divOutput.innerHTML = '<strong>Error:</strong> Could not reach the suggestion service.';
+    }
+}
+
 // Onload, set up event listeners
 document.addEventListener('DOMContentLoaded', () => {
-    document.querySelector('#btnSuggestProfile').addEventListener('click', () => {
-        // Pass the summary textarea ID, the suggestion box ID, and a context label so it knows what to review
-        getAISuggestion('txtSummary', 'divProfileSuggestion', 'professional summary');
-    });
+    document.querySelector('#btnSuggestProfile').addEventListener('click', suggestProfileSummary);
+    document.querySelector('#btnSuggestSkills').addEventListener('click', suggestSkills);
 });

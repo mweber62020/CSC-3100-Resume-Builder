@@ -61,8 +61,10 @@ async function addCert() {
     const strIssuer = document.querySelector('#txtCertIssuer').value.trim();
     const strDate   = document.querySelector('#txtCertDate').value.trim();
 
+    // Clear any previous validation and check fields
+    document.querySelector('#txtCertName').classList.remove('is-invalid');
     if (strName === '') {
-        Swal.fire({ title: 'Missing Field', text: 'Certification name is required.', icon: 'warning' });
+        document.querySelector('#txtCertName').classList.add('is-invalid');
         return;
     }
 
@@ -82,6 +84,7 @@ async function addCert() {
         }
         // Clear the form and reload the certifications list
         document.querySelector('#frmAddCert').reset();
+        document.querySelector('#txtCertName').classList.remove('is-invalid');
         loadCerts();
     } catch (objError) {
         Swal.fire({ title: 'Error', text: 'Could not add certification.', icon: 'error' });

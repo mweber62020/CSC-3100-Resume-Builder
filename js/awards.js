@@ -66,8 +66,10 @@ async function addAward() {
     const strDate = document.querySelector('#txtAwardDate').value.trim();
     const strDescription = document.querySelector('#txtAwardDescription').value.trim();
 
+    // Clear any previous validation and check fields
+    document.querySelector('#txtAwardName').classList.remove('is-invalid');
     if (strName === '') {
-        Swal.fire({ title: 'Missing Field', text: 'Award name is required.', icon: 'warning' });
+        document.querySelector('#txtAwardName').classList.add('is-invalid');
         return;
     }
 
@@ -87,6 +89,7 @@ async function addAward() {
         }
         // Clear the form and reload the awards list
         document.querySelector('#frmAddAward').reset();
+        document.querySelector('#txtAwardName').classList.remove('is-invalid');
         loadAwards();
     } catch (objError) {
         Swal.fire({ title: 'Error', text: 'Could not add award.', icon: 'error' });

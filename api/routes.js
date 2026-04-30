@@ -42,7 +42,8 @@
 //     POST /api/settings         - save a setting
 //
 //   GEMINI
-//     POST /api/gemini/suggest   - get AI suggestions
+//     POST /api/gemini/suggest   - suggest improvements to the profile summary
+//     POST /api/gemini/skills    - suggest skills based on saved jobs
 // ============================================================
 
 const express = require('express');
@@ -502,15 +503,15 @@ router.put('/settings', (req, res) => {
 // Gemini AI routes
 // ============================================================
 
-// POST /api/gemini/suggest - sends text to Gemini, returns suggestions
+// POST /api/gemini/suggest - reviews profile summary and returns suggestions
 router.post('/gemini/suggest', async (req, res) => {
-    const { strText, strContext } = req.body;
+    const { strText } = req.body;
 
     if (!strText || strText.trim() === '') {
         return res.status(400).json({ strError: 'Text to review is required.' });
     }
 
-    // Get API key - prefer the one saved in DB, if nothing there, use .env
+    // Get API key - prefer the one saved in DB, fall back to .env
     let strApiKey = process.env.GEMINI_API_KEY;
     try {
         const objSetting = db.prepare(`SELECT strGeminiApiKey FROM tblSettings LIMIT 1`).get();
@@ -520,17 +521,58 @@ router.post('/gemini/suggest', async (req, res) => {
     if (!strApiKey) {
         return res.status(400).json({ strError: 'No Gemini API key found. Please add one in Settings.' });
     }
-    // strContext is passed from frontend to describe what is being reviewed (e.g. 'professional summary').
-    // Route is reusable for different fields.
-    const strContextInsert = strContext ? strContext.trim() : 'resume text'; // Default to 'resume text' if no context provided
-    const strPrompt = `You are a professional resume coach. Review the following ${strContextInsert} and provide 2-3 concise, actionable suggestions to improve it for a job application. Be specific and professional. Keep your response brief and formatted as a short list.
+
+    const strPrompt = `You are a professional resume coach. Review the following professional summary and provide 2-3 concise, actionable suggestions to improve it for a job application. Be specific and professional. Keep your response brief and formatted as a short list.
 
 Text to review:
 "${strText.trim()}"`;
 
     try {
         const objGenAI = new GoogleGenAI({ apiKey: strApiKey });
-        // generateContent() sends the prompt to Gemini and returns the response.
+        // generateContent() sends the prompt to Gemini and returns the response
+        const objResponse = await objGenAI.models.generateContent({
+            model: strModel,
+            contents: strPrompt
+        });
+
+        const strSuggestion = objResponse.text;
+
+        if (!strSuggestion) {
+            return res.status(502).json({ strError: 'No suggestion returned from Gemini.' });
+        }
+
+        res.status(200).json({ strSuggestion });
+    } catch (objError) {
+        res.status(500).json({ strError: 'Gemini error: ' + objError.message });
+    }
+});
+
+// POST /api/gemini/skills - suggests skills based on the user's job entries
+router.post('/gemini/skills', async (req, res) => {
+    const { strJobList } = req.body;
+
+    if (!strJobList || strJobList.trim() === '') {
+        return res.status(400).json({ strError: 'Job list is required.' });
+    }
+
+    let strApiKey = process.env.GEMINI_API_KEY;
+    try {
+        const objSetting = db.prepare(`SELECT strGeminiApiKey FROM tblSettings LIMIT 1`).get();
+        if (objSetting && objSetting.strGeminiApiKey) strApiKey = objSetting.strGeminiApiKey;
+    } catch (objError) {}
+
+    if (!strApiKey) {
+        return res.status(400).json({ strError: 'No Gemini API key found. Please add one in Settings.' });
+    }
+
+    const strPrompt = `You are a professional resume coach. Based on the following work experience, suggest 8-10 relevant skills to include on a resume. Be specific and practical. Format your response as a simple list with no extra explanation.
+
+Work experience:
+${strJobList.trim()}`;
+
+    try {
+        const objGenAI = new GoogleGenAI({ apiKey: strApiKey });
+        // sends the prompt to Gemini and returns the response
         const objResponse = await objGenAI.models.generateContent({
             model: strModel,
             contents: strPrompt
