@@ -15,7 +15,7 @@
   "type": "commonjs",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js"
   },
   "dependencies": {
     "@google/genai": "^1.50.1",
@@ -24,5 +24,8 @@
     "bootstrap-icons": "^1.13.1",
     "dotenv": "^16.6.1",
     "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "electron": "^41.3.0"
   }
 }
