@@ -10,6 +10,7 @@ const Database = require('better-sqlite3');
 const db = new Database('resume.db');
 
 // Create all tables if they don't already exist
+// AI-assisted section
 db.exec(`
     -- Stores user profile info
     CREATE TABLE IF NOT EXISTS tblProfile (

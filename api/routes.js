@@ -562,7 +562,7 @@ router.put('/settings', (req, res) => {
 // ============================================================
 // Gemini AI routes
 // ============================================================
-
+// AI-assisted section
 // POST /api/gemini/suggest - reviews profile summary and returns suggestions
 router.post('/gemini/suggest', async (req, res) => {
     const { strText } = req.body;

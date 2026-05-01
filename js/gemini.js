@@ -2,7 +2,7 @@
 // gemini.js - Frontend logic for AI suggestions
 // Two suggestion functions for the profile summary and skills.
 // ============================================================
-
+// AI-assisted section
 // API endpoints for Gemini suggestions
 const strGeminiSuggestUrl = '/api/gemini/suggest';
 const strGeminiSkillsUrl  = '/api/gemini/skills';

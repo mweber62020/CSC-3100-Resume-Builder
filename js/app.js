@@ -33,7 +33,7 @@ function showSection(strSectionID) {
 // ------------------------------------------------------------
 // Dark Mode Toggle
 // ------------------------------------------------------------
-
+// AI-assisted section
 // Apply the saved theme on initial load. Default to 'light' if nothing saved.
 const strSavedTheme = localStorage.getItem('theme') || 'light';
 document.documentElement.setAttribute('data-bs-theme', strSavedTheme);

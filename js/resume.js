@@ -63,6 +63,7 @@ async function loadResumeBuilder() {
 // renderSelections()
 // Builds the checkbox UI so the user can pick what to include in their resume.
 // ------------------------------------------------------------
+// AI-assisted section
 function renderSelections() {
     const divSelections = document.querySelector('#divResumeSelections');
 
@@ -301,6 +302,7 @@ function toggleAll(strType) {
 // generatePreview()
 // Reads all checked checkboxes, filters the data to only the selected items, and renders a formatted resume into divResumePreview.
 // ------------------------------------------------------------
+// AI-assisted section
 function generatePreview() {
     // Get selected data from each section by getting checked checkboxes that have the respective class, then maps to their IDs so we can filter.
     const arrSelectedEduIDs  = [...document.querySelectorAll('.education-check:checked')].map(el => parseInt(el.value));
@@ -517,6 +519,7 @@ function generatePreview() {
 // printResume()
 // Opens a new window containing only the resume HTML and triggers print dialog there.
 // ------------------------------------------------------------
+// AI-assisted section
 function printResume() {
     const divPreview = document.querySelector('#divResumePreview');
     // Make sure there's something in preview before printing
