@@ -57,7 +57,7 @@ const { db } = require('../db');
 const { GoogleGenAI } = require('@google/genai');
 
 // Gemini model
-const strModel = 'gemini-2.0-flash-lite';
+const strModel = 'gemini-2.5-flash';
 
 // ============================================================
 // Profile routes
